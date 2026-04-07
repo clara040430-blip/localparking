@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>단골파킹 - 스마트 주차 패스</title>
+    <style>
+        :root {
+            --bg-color: #f2f4f8;
+            --main-color: #2b3a55; /* 신뢰감을 주는 네이비 톤 */
+            --accent-color: #ff9f43; /* 포인트 컬러 */
+            --text-dark: #2d3436;
+            --text-gray: #636e72;
+            --white: #ffffff;
+            --success: #00b894;
+            --border-color: #dfe6e9;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Pretendard", sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #e5e5e5; display: flex; justify-content: center; overflow: hidden; }
+
+        /* 모바일 앱 화면 틀 */
+        .app-container { width: 100%; max-width: 420px; height: 100vh; background-color: var(--bg-color); position: relative; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+
+        /* 헤더 */
+        .header { background-color: var(--main-color); color: var(--white); padding: 25px 20px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; z-index: 10; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .header h1 { font-size: 1.3rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .user-greeting { font-size: 0.85rem; color: #b2bec3; margin-top: 5px; }
+        .icon-btn { font-size: 1.4rem; cursor: pointer; padding: 5px; }
+
+        .content { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 90px; }
+        
+        /* 공통 카드 스타일 */
+        .section-title { font-size: 1.05rem; font-weight: 700; color: var(--text-gray); margin-bottom: 12px; margin-top: 15px; }
+        .card { background-color: var(--white); border-radius: 16px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); margin-bottom: 15px; border: 1px solid var(--border-color); }
+
+        /* 주차 패스 상태 (핵심) */
+        .pass-card { background: var(--white); border-radius: 20px; padding: 25px 20px; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.05); margin-bottom: 25px; border: 2px solid var(--main-color); position: relative; overflow: hidden; }
+        .pulse-ring { position: absolute; top: 15px; right: 15px; width: 12px; height: 12px; background-color: var(--success); border-radius: 50%; box-shadow: 0 0 0 0 rgba(0, 184, 148, 0.7); animation: pulse 1.5s infinite; }
+        @keyframes pulse { 70% { box-shadow: 0 0 0 10px rgba(0, 184, 148, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 184, 148, 0); } }
+        
+        .pass-status { font-size: 0.9rem; color: var(--success); font-weight: 700; margin-bottom: 10px; }
+        .pass-location { font-size: 1.5rem; font-weight: 800; color: var(--text-dark); margin-bottom: 5px; }
+        .pass-timer { font-size: 2.5rem; font-weight: 300; color: var(--main-color); margin: 15px 0; font-variant-numeric: tabular-nums; }
+        
+        .listening-box { background-color: #f8f9fa; border-radius: 10px; padding: 12px; font-size: 0.85rem; color: var(--text-gray); display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 15px; border: 1px dashed #b2bec3; }
+
+        /* 결제 내역 및 정산 모듈 */
+        .receipt-item { padding: 15px 0; border-bottom: 1px solid var(--border-color); }
+        .receipt-item:last-child { border-bottom: none; }
+        .receipt-top { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .shop-name { font-weight: 700; font-size: 1.05rem; color: var(--text-dark); }
+        .amount { font-weight: 700; font-size: 1.05rem; }
+        .receipt-bottom { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-gray); }
+        .fund-badge { display: inline-block; background-color: #fff3e0; color: #e67e22; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; margin-top: 8px; border: 1px solid #ffe0b2; }
+
+        .fee-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.95rem; color: var(--text-dark); }
+        .fee-total { display: flex; justify-content: space-between; margin-top: 15px; padding-top: 15px; border-top: 2px solid var(--main-color); font-size: 1.3rem; font-weight: 800; color: var(--main-color); }
+
+        .action-btn { width: 100%; background-color: var(--accent-color); color: white; border: none; padding: 16px; border-radius: 12px; font-size: 1.05rem; font-weight: 700; margin-top: 20px; cursor: pointer; transition: transform 0.1s; box-shadow: 0 4px 10px rgba(255, 159, 67, 0.3); }
+        .action-btn:active { transform: scale(0.98); }
+
+        /* 하단 네비게이션 */
+        .bottom-nav { position: absolute; bottom: 0; width: 100%; height: 75px; background-color: var(--white); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border-color); padding-bottom: 10px; z-index: 10; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-gray); font-size: 0.75rem; cursor: pointer; padding: 10px; width: 33.3%; }
+        .nav-item.active { color: var(--main-color); font-weight: bold; }
+        .nav-icon { font-size: 1.4rem; margin-bottom: 4px; }
+
+        /* 가상 SMS 알림 팝업 */
+        .sms-popup { position: absolute; top: -100px; left: 50%; transform: translateX(-50%); width: 90%; background-color: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 16px; padding: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 100; transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border-left: 5px solid #0984e3; }
+        .sms-popup.show { top: 20px; }
+        .sms-header { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-gray); margin-bottom: 8px; font-weight: 700; }
+        .sms-body { font-size: 0.95rem; color: var(--text-dark); line-height: 1.4; }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div id="smsPopup" class="sms-popup">
+            <div class="sms-header"><span>💬 카드사 결제 알림</span><span>방금</span></div>
+            <div class="sms-body">
+                [신한카드] 승인 홍예진님<br>
+                12,500원 일시불<br>
+                04/07 13:15 <strong>동네 커피로스터스</strong>
+            </div>
+        </div>
+
+        <div class="header">
+            <div>
+                <h1>🅿️ 단골파킹</h1>
+                <div class="user-greeting">홍예진님, 광주 서구 상권 방문을 환영합니다.</div>
+            </div>
+            <div class="icon-btn" onclick="alert('서구 상인회 연합 기금 잔액: 1,450,000원')">🏦</div>
+        </div>
+
+        <div class="content">
+            <div class="pass-card">
+                <div class="pulse-ring" id="pulseRing"></div>
+                <div class="pass-status">✓ 입차 확인됨 (위치 기반)</div>
+                <div class="pass-location">광주 서구 제1주차장</div>
+                <div class="pass-timer">01:30:45</div>
+                <div class="listening-box" id="listeningBox">
+                    📡 기기의 결제 데이터(SMS/알림)를 모니터링 중입니다...
+                </div>
+            </div>
+
+            <h2 class="section-title">디지털 방문 인증 내역</h2>
+            <div class="card" style="padding: 10px 20px;">
+                <div class="receipt-item" id="receiptItem" style="opacity: 0.4;">
+                    <div class="receipt-top">
+                        <span class="shop-name">결제 대기 중</span>
+                        <span class="amount">-</span>
+                    </div>
+                    <div class="receipt-bottom">
+                        <span>상점에서 결제 시 자동 기록됩니다.</span>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="section-title">정산 관리 모듈 (상인회 연동)</h2>
+            <div class="card">
+                <div class="fee-row"><span>누적 주차 요금 (90분)</span><span>3,000원</span></div>
+                <div class="fee-row"><span>상인회 공동 기금 지원금</span><span id="discountText" style="color: var(--success); font-weight: 700;">0원</span></div>
+                <div class="fee-total"><span>최종 출차 요금</span><span id="totalFeeText">3,000원</span></div>
+            </div>
+
+            <button class="action-btn" id="simulateBtn" onclick="triggerSMS()">상점 결제 시뮬레이션 (SMS 수신)</button>
+            <button class="action-btn" id="resetBtn" onclick="location.reload()" style="background-color: #e2e8f0; color: #2d3436; display: none; margin-top: 10px; box-shadow: none;">초기화</button>
+        </div>
+
+        <div class="bottom-nav">
+            <div class="nav-item active"><div class="nav-icon">🅿️</div><span>주차패스</span></div>
+            <div class="nav-item" onclick="alert('서구 상인회 제휴 가맹점 지도 모듈이 연결될 예정입니다.')"><div class="nav-icon">📍</div><span>가맹점찾기</span></div>
+            <div class="nav-item" onclick="alert('결제수단 및 차량 번호 설정 메뉴입니다.')"><div class="nav-icon">⚙️</div><span>설정</span></div>
+        </div>
+    </div>
+
+    <script>
+        function triggerSMS() {
+            const simulateBtn = document.getElementById('simulateBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const smsPopup = document.getElementById('smsPopup');
+            const listeningBox = document.getElementById('listeningBox');
+            const receiptItem = document.getElementById('receiptItem');
+            const pulseRing = document.getElementById('pulseRing');
+
+            simulateBtn.disabled = true;
+            simulateBtn.innerText = "데이터 파싱 중...";
+            simulateBtn.style.backgroundColor = "#b2bec3";
+
+            // 1. 휴대폰에 카드 결제 문자가 도착하는 연출
+            setTimeout(() => {
+                smsPopup.classList.add('show');
+            }, 300);
+
+            // 2. 앱이 문자를 읽어들여 상점을 매칭하고 요금을 깎아주는 로직
+            setTimeout(() => {
+                smsPopup.classList.remove('show'); // 문자 팝업 숨김
+                
+                listeningBox.innerHTML = "✅ 결제 데이터 정합성 검증 완료 (T1 < T2 < T3)";
+                listeningBox.style.backgroundColor = "#e8f5e9";
+                listeningBox.style.borderColor = "#81c784";
+                listeningBox.style.color = "#2e7d32";
+                pulseRing.style.display = "none"; // 모니터링 링 종료
+
+                receiptItem.style.opacity = '1';
+                receiptItem.innerHTML = `
+                    <div class="receipt-top">
+                        <span class="shop-name">동네 커피로스터스</span>
+                        <span class="amount">12,500원</span>
+                    </div>
+                    <div class="receipt-bottom">
+                        <span>카드사 SMS 파싱 완료</span>
+                        <span>13:15 승인</span>
+                    </div>
+                    <div class="fund-badge">서구 상인회 공동 기금에서 주차비 차감</div>
+                `;
+
+                document.getElementById('discountText').innerText = '- 3,000원 (100% 지원)';
+                document.getElementById('totalFeeText').innerText = '0원';
+
+                simulateBtn.style.display = 'none';
+                resetBtn.style.display = 'block';
+
+            }, 2500); // 2.5초 뒤 자동 정산
+        }
+    </script>
+</body>
+</html>
