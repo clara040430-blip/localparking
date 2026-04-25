@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>서구청 스마트 주차 앱 - 통합 상권 연동</title>
+    <title>광주 서구청 스마트 상권 통합 주차 플랫폼</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
@@ -34,6 +34,12 @@
 
         @keyframes scanline { 0% { top: 0; } 50% { top: 100%; } 100% { top: 0; } }
         .modal-overlay { background: rgba(0,0,0,0.6); backdrop-filter: blur(2px); }
+        
+        /* 다크모드 지도 커스텀 요소 */
+        .map-bg { background-color: #1a1e24; }
+        .map-road { position: absolute; background-color: #2a2f38; }
+        .map-subway { position: absolute; background-color: #22c55e; height: 3px; transform: rotate(-45deg); }
+        .map-building { position: absolute; background-color: #2d333b; border: 1px solid #3d4450; border-radius: 6px; }
     </style>
 </head>
 <body>
@@ -56,7 +62,7 @@
                 <span class="material-symbols-outlined" style="font-size: 32px;">location_city</span>
             </div>
             <h3 class="text-xl font-black text-gray-800 mb-2">통합 주차장 입차 감지</h3>
-            <p class="text-sm text-gray-500 font-bold mb-6">금호동 상권 연합 (골목상점가)을<br>방문하실 예정이신가요?</p>
+            <p class="text-sm text-gray-500 font-bold mb-6">김이강 님, 서구청 인근 상점가를<br>방문하실 예정이신가요?</p>
             <div class="flex flex-col gap-3">
                 <button onclick="confirmPurpose(true)" class="w-full bg-[#0A2540] text-white py-4 rounded-xl font-bold shadow-md active:scale-95 transition">예, 상점가 방문 예정입니다</button>
                 <button onclick="confirmPurpose(false)" class="w-full bg-gray-100 text-gray-600 py-4 rounded-xl font-bold active:scale-95 transition">아니오, 일반 주차입니다</button>
@@ -70,7 +76,7 @@
                 <span class="material-symbols-outlined" style="font-size: 32px;">no_crash</span>
             </div>
             <h3 class="font-black text-xl text-gray-800 mb-2">차량이 출차되었습니다</h3>
-            <p class="text-sm text-gray-500 font-bold mb-6">주차 정산을 종료하시겠습니까?</p>
+            <p class="text-sm text-gray-500 font-bold mb-6">김이강 님, 정산을 종료하시겠습니까?</p>
             <div class="w-full space-y-3">
                 <button onclick="confirmCheckout()" class="w-full bg-[#0A2540] text-white font-bold py-3.5 rounded-xl shadow-md active:scale-95 transition">네, 정산 후 종료합니다</button>
                 <button onclick="document.getElementById('checkout-modal').classList.add('hidden'); document.getElementById('checkout-modal').classList.remove('flex');" class="w-full bg-gray-100 text-gray-700 font-bold py-3.5 rounded-xl active:scale-95 transition">아니오, 다른 목적지 가기</button>
@@ -108,7 +114,13 @@
         <div id="tab-home" class="tab-content fade-in min-h-full">
             
             <div id="view-home-ready" class="p-6 pt-8">
-                <h1 class="text-2xl font-black text-gray-800 leading-tight mb-6">홍석기님,<br>어디로 이동하시나요?</h1>
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-full overflow-hidden border border-gray-200 shadow-sm bg-gray-100 flex items-center justify-center">
+                        <img src="profile.png" alt="프로필" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" class="w-full h-full object-cover">
+                        <span class="material-symbols-outlined text-gray-400 hidden" style="font-size: 30px;">person</span>
+                    </div>
+                    <h1 class="text-2xl font-black text-gray-800 leading-tight">김이강 님,<br>어디로 이동하시나요?</h1>
+                </div>
                 
                 <div class="relative shadow-sm rounded-2xl overflow-hidden mb-6">
                     <input type="text" id="search-input" placeholder="상점가 이름이나 주차장 검색" class="w-full py-4 pl-12 pr-4 bg-white border border-gray-200 outline-none focus:border-blue-500 text-sm font-bold text-gray-700 shadow-sm" oninput="showParkingLots()">
@@ -116,27 +128,35 @@
                 </div>
 
                 <div id="parking-list-container" class="hidden fade-in">
-                    <h3 class="font-bold text-gray-800 text-sm mb-3 px-1">금호동 상권 통합 지원 주차장 (Hub)</h3>
+                    <h3 class="font-bold text-gray-800 text-sm mb-3 px-1">서구 상권 통합 지원 허브 주차장</h3>
                     <div class="space-y-3">
                         <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm flex justify-between items-center">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-600"><span class="material-symbols-outlined">local_parking</span></div>
-                                <div>
-                                    <p class="font-bold text-gray-800 text-sm">A 공영 주차장</p>
-                                    <p class="text-[10px] text-green-600 font-bold mt-1">상인 연합회 메인 거점</p>
-                                </div>
+                                <div><p class="font-bold text-gray-800 text-sm">서구청 통합 허브 주차장</p><p class="text-[10px] text-green-600 font-bold mt-1">서구 공영 · 42자리 남음</p></div>
                             </div>
-                            <button onclick="triggerParkingCommunication('A 공영 주차장')" class="bg-[#0A2540] text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md active:scale-95 transition">입차</button>
+                            <button onclick="triggerParkingCommunication('서구청 통합 허브 주차장')" class="bg-[#0A2540] text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md active:scale-95 transition">입차</button>
                         </div>
                         <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm flex justify-between items-center">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-orange-50 rounded-full flex items-center justify-center text-orange-500"><span class="material-symbols-outlined">school</span></div>
-                                <div>
-                                    <p class="font-bold text-gray-800 text-sm">서구 초등학교 (야간)</p>
-                                    <p class="text-[10px] text-orange-600 font-bold mt-1">평일 18:00 이후 개방</p>
-                                </div>
+                                <div class="w-10 h-10 bg-teal-50 rounded-full flex items-center justify-center text-teal-600"><span class="material-symbols-outlined">health_and_safety</span></div>
+                                <div><p class="font-bold text-gray-800 text-sm">서구보건소 나눔 주차장</p><p class="text-[10px] text-teal-600 font-bold mt-1">공공기관 개방 · 15자리 남음</p></div>
                             </div>
-                            <button onclick="triggerParkingCommunication('서구 초등학교 (야간)')" class="bg-[#0A2540] text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md active:scale-95 transition">입차</button>
+                            <button onclick="triggerParkingCommunication('서구보건소 나눔 주차장')" class="bg-[#0A2540] text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md active:scale-95 transition">입차</button>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm flex justify-between items-center">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-orange-50 rounded-full flex items-center justify-center text-orange-500"><span class="material-symbols-outlined">storefront</span></div>
+                                <div><p class="font-bold text-gray-800 text-sm">상생 비타민 공유 주차장</p><p class="text-[10px] text-orange-600 font-bold mt-1">민간 상점 협력 · 5자리 남음</p></div>
+                            </div>
+                            <button onclick="triggerParkingCommunication('상생 비타민 공유 주차장')" class="bg-[#0A2540] text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md active:scale-95 transition">입차</button>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm flex justify-between items-center">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-600"><span class="material-symbols-outlined">account_balance</span></div>
+                                <div><p class="font-bold text-gray-800 text-sm">KJB 상생 금융 주차장</p><p class="text-[10px] text-indigo-600 font-bold mt-1">금융권 공유 · 18:00 이후</p></div>
+                            </div>
+                            <button onclick="triggerParkingCommunication('KJB 상생 금융 주차장')" class="bg-[#0A2540] text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md active:scale-95 transition">입차</button>
                         </div>
                     </div>
                 </div>
@@ -148,36 +168,36 @@
                         <span class="material-symbols-outlined text-sm mr-1 text-blue-500">ev_station</span> 
                         <span id="lbl-parking-name" class="font-black text-gray-700 mr-2">주차장</span> 입차 완료
                     </p>
-                    <p class="text-[11px] text-blue-600 font-black">상권 통합 정산 시스템 활성화</p>
+                    <p class="text-[11px] text-blue-600 font-black">골목상권 통합 정산 시스템 활성화</p>
                 </div>
                 
-                <h3 class="font-black text-gray-800 text-base mb-3 px-1">방문 상점 결제 시뮬레이션</h3>
+                <h3 class="font-black text-gray-800 text-base mb-3 px-1">방문 상점 결제 연동 (시뮬레이션)</h3>
                 <div class="space-y-3 mb-6">
-                    <button onclick="payMySelf(60, '원조 국밥집')" class="w-full flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl active:scale-95 transition shadow-sm group">
+                    <button onclick="payMySelf(60, '다락 국밥집')" class="w-full flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl active:scale-95 transition shadow-sm group">
                         <div class="flex items-center">
                             <div class="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center text-orange-500 mr-4"><span class="material-symbols-outlined">soup_kitchen</span></div>
-                            <div class="text-left">
-                                <p class="font-bold text-gray-800 text-sm">원조 국밥집</p>
-                                <p class="text-[10px] text-gray-500 font-bold mt-0.5">금호동 상인회 A구역 소속</p>
-                            </div>
+                            <div class="text-left"><p class="font-bold text-gray-800 text-sm">다락 국밥집</p><p class="text-[10px] text-gray-500 font-bold mt-0.5">결제 시연 (1시간)</p></div>
                         </div>
                         <div class="bg-orange-100 text-orange-600 font-black text-sm px-3 py-1.5 rounded-lg">+60분</div>
                     </button>
-
-                    <button onclick="payMySelf(30, '골목 테라스 카페')" class="w-full flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl active:scale-95 transition shadow-sm group">
+                    <button onclick="payMySelf(30, '서구청 행복 카페')" class="w-full flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl active:scale-95 transition shadow-sm group">
                         <div class="flex items-center">
                             <div class="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center text-amber-500 mr-4"><span class="material-symbols-outlined">local_cafe</span></div>
-                            <div class="text-left">
-                                <p class="font-bold text-gray-800 text-sm">골목 테라스 카페</p>
-                                <p class="text-[10px] text-gray-500 font-bold mt-0.5">상인회 B구역 연합 지원</p>
-                            </div>
+                            <div class="text-left"><p class="font-bold text-gray-800 text-sm">서구청 행복 카페</p><p class="text-[10px] text-gray-500 font-bold mt-0.5">결제 시연 (30분)</p></div>
                         </div>
                         <div class="bg-amber-100 text-amber-600 font-black text-sm px-3 py-1.5 rounded-lg">+30분</div>
+                    </button>
+                    <button onclick="payMySelf(120, '골목 상생 미용실')" class="w-full flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl active:scale-95 transition shadow-sm group">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-purple-50 rounded-full flex items-center justify-center text-purple-500 mr-4"><span class="material-symbols-outlined">content_cut</span></div>
+                            <div class="text-left"><p class="font-bold text-gray-800 text-sm">골목 상생 미용실</p><p class="text-[10px] text-gray-500 font-bold mt-0.5">결제 시연 (2시간)</p></div>
+                        </div>
+                        <div class="bg-purple-100 text-purple-600 font-black text-sm px-3 py-1.5 rounded-lg">+120분</div>
                     </button>
                 </div>
 
                 <div class="bg-gray-100 rounded-xl p-4 text-center mb-6 border border-gray-200">
-                    <p class="text-xs font-bold text-gray-600 mb-1">일행이 대표로 결제하셨나요?</p>
+                    <p class="text-xs font-bold text-gray-600 mb-1">일행이 대표로 상점을 결제하셨나요?</p>
                     <button onclick="switchTab('qr', document.getElementById('nav-qr'))" class="mt-2 bg-white border border-gray-300 text-gray-700 text-xs font-bold px-4 py-2 rounded-full shadow-sm active:scale-95">QR 스캔하고 혜택 공유받기</button>
                 </div>
 
@@ -228,45 +248,44 @@
             </div>
         </div>
 
-        <div id="tab-map" class="tab-content hidden h-full flex flex-col fade-in">
-            <div class="p-6 pt-8 pb-4 border-b border-gray-100 z-30 relative bg-white shadow-sm flex items-center justify-between">
-                <h2 class="font-black text-xl text-gray-800">통합 상권 바운더리 맵</h2>
-                <button class="bg-blue-50 text-blue-600 p-2 rounded-full"><span class="material-symbols-outlined" style="font-size:20px;">my_location</span></button>
+        <div id="tab-map" class="tab-content hidden h-full flex flex-col fade-in bg-gray-900">
+            <div class="absolute top-0 left-0 w-full p-6 pt-10 z-30 flex justify-between items-center pointer-events-none">
+                <h2 class="font-black text-xl text-white bg-black/60 px-4 py-2 rounded-xl backdrop-blur-sm">서구청 주변 상권 연합 지도</h2>
+                <button class="bg-white/10 p-2 rounded-full pointer-events-auto backdrop-blur-sm border border-white/20 text-white"><span class="material-symbols-outlined">my_location</span></button>
             </div>
             
-            <div class="flex-1 bg-[#EBE9E4] relative overflow-hidden flex items-center justify-center">
-                <div class="absolute inset-0 opacity-20" style="background-image: linear-gradient(#9CA3AF 2px, transparent 2px), linear-gradient(90deg, #9CA3AF 2px, transparent 2px); background-size: 60px 60px;"></div>
+            <div class="flex-1 map-bg relative overflow-hidden">
+                <div class="map-road w-[150%] h-12 top-[60%] left-[-20%] transform rotate-[-25deg]"></div>
+                <div class="map-subway w-[150%] top-[65%] left-[-20%] transform rotate-[-25deg]"></div>
+                <div class="absolute top-[68%] left-[45%] bg-[#22c55e] border-2 border-white rounded-full w-4 h-4 z-10 shadow-[0_0_10px_#22c55e]"></div>
                 
-                <div class="absolute top-[10%] left-[5%] w-32 h-20 bg-[#CBD5E1] border-2 border-gray-400 rounded-lg flex items-center justify-center shadow-md rotate-[-5deg]">
-                    <span class="text-[10px] font-black text-gray-600">금호 1차 아파트 (배후지)</span>
-                </div>
-                <div class="absolute bottom-[10%] right-[10%] w-36 h-24 bg-[#CBD5E1] border-2 border-gray-400 rounded-lg flex items-center justify-center shadow-md rotate-[3deg]">
-                    <span class="text-[10px] font-black text-gray-600">진흥 더루벤스 (배후지)</span>
-                </div>
-
-                <div class="absolute top-[20%] left-[15%] right-[15%] bottom-[25%] border-[3px] border-dashed border-blue-500 rounded-[3rem] bg-white/40 flex flex-col items-center justify-center z-10 shadow-[0_0_30px_rgba(59,130,246,0.15)]">
-                    <div class="absolute -top-3 bg-blue-600 text-white text-xs font-black px-4 py-1 rounded-full shadow-md">금호동 상권 연합 구역 (A+B+C)</div>
-                    
-                    <div class="absolute top-[20%] left-[10%] w-24 h-24 bg-red-400/20 rounded-full blur-md"></div>
-                    <div class="absolute bottom-[20%] right-[10%] w-32 h-32 bg-blue-400/20 rounded-full blur-md"></div>
-                    <div class="absolute top-[40%] right-[20%] w-20 h-20 bg-green-400/20 rounded-full blur-md"></div>
+                <div class="map-building w-48 h-32 top-[20%] left-[45%] flex flex-col items-center justify-center opacity-80">
+                    <span class="material-symbols-outlined text-orange-400 mb-1">account_balance</span>
+                    <span class="text-[10px] text-gray-300 font-bold">광주광역시 서구청</span>
+                    <div class="w-4 h-4 bg-blue-500/80 rounded-full mt-2 border border-white flex items-center justify-center"><span class="text-[8px] text-white">P</span></div>
                 </div>
 
-                <div class="absolute top-[45%] left-[50%] transform -translate-x-1/2 flex flex-col items-center z-20 hover:scale-110 transition-transform">
-                    <div class="bg-[#0A2540] text-white text-[10px] font-bold px-2 py-1 rounded-md mb-1 shadow-lg">A 공영 주차장 (메인)</div>
-                    <div class="w-10 h-10 bg-white border-4 border-[#0A2540] rounded-full flex items-center justify-center shadow-xl animate-bounce">
-                        <span class="material-symbols-outlined text-[#0A2540] text-[20px]" style="font-variation-settings: 'FILL' 1;">local_parking</span>
+                <div class="map-building w-24 h-20 top-[15%] left-[15%] flex flex-col items-center justify-center opacity-80">
+                    <span class="material-symbols-outlined text-red-400 mb-1">local_hospital</span>
+                    <span class="text-[9px] text-gray-300 font-bold">서구보건소</span>
+                    <div class="w-4 h-4 bg-teal-500/80 rounded-full mt-1 border border-white flex items-center justify-center"><span class="text-[8px] text-white">P</span></div>
+                </div>
+
+                <div class="map-building w-28 h-16 bottom-[15%] left-[30%] flex flex-col items-center justify-center opacity-80">
+                    <span class="text-[9px] text-gray-300 font-bold text-center">KJB 광주은행<br>& 비타민 마트</span>
+                    <div class="w-4 h-4 bg-indigo-500/80 rounded-full mt-1 border border-white flex items-center justify-center"><span class="text-[8px] text-white">P</span></div>
+                </div>
+
+                <div class="absolute bottom-[20%] left-[5%] w-28 h-40 border-2 border-dashed border-orange-400 bg-orange-400/10 rounded-xl z-10 flex flex-col items-center p-2">
+                    <span class="text-orange-400 text-[10px] font-black bg-black/50 px-2 py-0.5 rounded mb-2">골목상권 상생 구역</span>
+                    <div class="w-full flex justify-around mt-1">
+                        <span class="material-symbols-outlined text-red-400 text-sm bg-[#3d4450] p-1 rounded-full">local_cafe</span>
+                        <span class="material-symbols-outlined text-red-400 text-sm bg-[#3d4450] p-1 rounded-full">restaurant</span>
                     </div>
-                </div>
-
-                <div class="absolute top-[30%] right-[25%] flex flex-col items-center z-20">
-                    <div class="bg-orange-500 text-white text-[9px] font-bold px-2 py-1 rounded-md mb-1">서구 초등학교 (야간개방)</div>
-                    <span class="material-symbols-outlined text-orange-500 text-2xl" style="font-variation-settings: 'FILL' 1;">school</span>
-                </div>
-
-                <div class="absolute bottom-[35%] left-[25%] flex flex-col items-center z-20">
-                    <div class="bg-green-600 text-white text-[9px] font-bold px-2 py-1 rounded-md mb-1">상무 병원 주차장</div>
-                    <span class="material-symbols-outlined text-green-600 text-2xl" style="font-variation-settings: 'FILL' 1;">local_hospital</span>
+                    <div class="w-full flex justify-around mt-2">
+                        <span class="material-symbols-outlined text-red-400 text-sm bg-[#3d4450] p-1 rounded-full">local_cafe</span>
+                        <span class="material-symbols-outlined text-red-400 text-sm bg-[#3d4450] p-1 rounded-full">content_cut</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -281,8 +300,8 @@
                         <span class="text-xs font-bold text-gray-500 flex items-center"><span class="material-symbols-outlined text-[16px] mr-1">event_available</span> 10월 12일</span>
                         <span class="text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded-full">정산 완료</span>
                     </div>
-                    <h3 class="font-bold text-gray-800 mb-1 text-base">A 공영 주차장</h3>
-                    <p class="text-[10px] text-blue-500 font-bold mb-4">방문 상점: 원조 국밥집</p>
+                    <h3 class="font-bold text-gray-800 mb-1 text-base">서구청 통합 허브 주차장</h3>
+                    <p class="text-[10px] text-blue-500 font-bold mb-4">방문 상점: 다락 국밥집</p>
                     <div class="flex justify-between text-sm mb-2"><span class="text-gray-500 font-bold">확보 시간</span><span class="font-black text-gray-800">60분</span></div>
                     <div class="flex justify-between text-sm mb-4"><span class="text-gray-500 font-bold">실제 이용 시간</span><span class="font-black text-gray-800">45분</span></div>
                     <div class="bg-blue-50 p-3 rounded-xl flex justify-between items-center border border-blue-100">
@@ -306,7 +325,7 @@
                     <div class="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-[#00D4FF]"></div>
                     <div class="absolute top-0 left-0 w-full h-1 bg-[#00D4FF] shadow-[0_0_15px_#00D4FF]" style="animation: scanline 2s linear infinite;"></div>
                 </div>
-                <button onclick="simulateScanFriend(60, '고깃집(일행 결제)')" class="bg-[#00D4FF] text-[#0A2540] font-black px-6 py-3 rounded-full shadow-lg active:scale-95 transition text-sm flex items-center">
+                <button onclick="simulateScanFriend(30, '상생 으뜸 베이커리 (일행 결제)')" class="bg-[#00D4FF] text-[#0A2540] font-black px-6 py-3 rounded-full shadow-lg active:scale-95 transition text-sm flex items-center">
                     <span class="material-symbols-outlined mr-2 text-lg">check_circle</span> 카메라 스캔 완료 시연
                 </button>
             </div>
@@ -339,17 +358,18 @@
             <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-200 relative overflow-hidden mb-6">
                 <div class="absolute top-0 left-0 w-full h-16 bg-blue-50"></div>
                 <div class="relative z-10 flex flex-col items-center">
-                    <div class="w-20 h-20 bg-white border-4 border-white shadow-md rounded-full flex items-center justify-center text-gray-400 mb-3 mt-4 overflow-hidden">
-                        <span class="material-symbols-outlined" style="font-size: 48px;">account_circle</span>
+                    <div class="w-24 h-24 bg-white border-4 border-white shadow-md rounded-full flex items-center justify-center text-gray-400 mb-3 mt-2 overflow-hidden">
+                        <img src="profile.png" alt="프로필" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" class="w-full h-full object-cover">
+                        <span class="material-symbols-outlined hidden" style="font-size: 48px;">account_circle</span>
                     </div>
-                    <h3 class="font-black text-xl text-gray-800">홍석기 <span class="text-sm font-bold text-gray-500 ml-1">님</span></h3>
-                    <p class="text-[10px] text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded-full mt-1 border border-blue-100">골목 상권 연합 조합원</p>
+                    <h3 class="font-black text-xl text-gray-800">김이강 <span class="text-sm font-bold text-gray-500 ml-1">님</span></h3>
+                    <p class="text-[10px] text-blue-600 font-bold bg-blue-50 px-3 py-1 rounded-full mt-2 border border-blue-100">골목 상권 연합 조합원</p>
                 </div>
                 
                 <div class="mt-6 pt-6 border-t border-gray-100 space-y-4">
                     <div class="flex justify-between items-center">
                         <span class="text-xs font-bold text-gray-400 tracking-tight">기본 등록 차량</span>
-                        <span class="text-sm font-black text-gray-800 bg-gray-100 px-3 py-1 rounded-lg tracking-tighter">54구 2895</span>
+                        <span class="text-sm font-black text-gray-800 bg-gray-100 px-3 py-1 rounded-lg tracking-tighter">123가 4567</span>
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-xs font-bold text-gray-400 tracking-tight">연결 휴대전화</span>
@@ -595,7 +615,7 @@
             resultDesc.innerText = "미사용 시간 자동 반납";
             resultVal.innerText = remainingMins + "분";
             resultVal.className = "text-4xl font-black text-blue-600 tracking-tighter";
-            resultTxt.innerHTML = `홍석기 님, 오늘 상권 방문에 감사드립니다!<br>사용하지 않으신 <span class="text-blue-600 font-black">${remainingMins}분</span> 혜택은<br>서구청 예산으로 소중히 환원되었습니다.`;
+            resultTxt.innerHTML = `김이강 님, 오늘 상권 방문에 감사드립니다!<br>사용하지 않으신 <span class="text-blue-600 font-black">${remainingMins}분</span> 혜택은<br>서구청 예산으로 소중히 환원되었습니다.`;
         } else {
             let fee = Math.abs(remainingMins) * 50; // 가상 비용 (분당 50원)
             resultBox.className = "flex justify-between items-center p-5 bg-red-50 rounded-xl border border-red-200 shadow-inner";
@@ -667,4 +687,3 @@
 </script>
 </body>
 </html>
-
