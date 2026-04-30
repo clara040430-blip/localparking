@@ -3,91 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>광주 서구청 스마트 상권 통합 주차 플랫폼</title>
+    <title>광주 서구 스마트 상권 통합 주차 플랫폼</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     
     <style>
         .hidden { display: none !important; }
-        .fade-in { animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes pulse-border { 0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); } 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); } }
+        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        .slide-up { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         
-        body, html { height: 100%; margin: 0; overflow: hidden; background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes scanline { 0% { top: 0; } 50% { top: 100%; } 100% { top: 0; } }
+        @keyframes ping-slow { 75%, 100% { transform: scale(2); opacity: 0; } }
         
-        .app-container { height: 100vh; display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; background: #f8fafc; box-shadow: 0 0 20px rgba(0,0,0,0.1); position: relative; }
-        .tabs-wrapper { flex: 1; overflow-y: auto; padding-bottom: 90px; scroll-behavior: smooth; }
+        body, html { height: 100%; margin: 0; overflow: hidden; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; touch-action: none; }
+        
+        .app-container { height: 100vh; display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; background: #ffffff; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.1); overflow: hidden; }
+        .tabs-wrapper { flex: 1; overflow-y: auto; overflow-x: hidden; padding-bottom: 90px; background: #f8fafc; scroll-behavior: smooth; }
         ::-webkit-scrollbar { width: 0px; background: transparent; }
         
-        /* 하단 네비게이션 */
-        .bottom-nav { position: absolute; bottom: 0; width: 100%; max-width: 480px; background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); border-top: 1px solid #e5e7eb; display: flex; justify-content: space-around; align-items: center; padding: 12px 0 25px 0; z-index: 50; }
-        .nav-btn { display: flex; flex-direction: column; align-items: center; font-size: 10px; color: #9CA3AF; font-weight: 700; background: none; border: none; outline: none; cursor: pointer; width: 20%; transition: all 0.2s; }
-        .nav-btn.active { color: #0A2540; }
-        .nav-btn .material-symbols-outlined { font-size: 24px; margin-bottom: 2px; transition: all 0.2s; }
-        .nav-btn.active .material-symbols-outlined { font-variation-settings: 'FILL' 1; color: #2563eb; transform: scale(1.1); }
+        /* 네비게이션 바 */
+        .bottom-nav { position: absolute; bottom: 0; width: 100%; max-width: 480px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-top: 1px solid #e2e8f0; display: flex; justify-content: space-around; padding: 12px 0 25px; z-index: 100; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); }
+        .nav-btn { display: flex; flex-direction: column; align-items: center; font-size: 10px; color: #94a3b8; font-weight: bold; border: none; background: none; flex: 1; transition: color 0.2s; }
+        .nav-btn.active { color: #2563eb; }
+        .nav-btn.active .material-symbols-outlined { font-variation-settings: 'FILL' 1; transform: scale(1.1); transition: transform 0.2s; }
         
-        /* 대시보드 타이머 */
-        .dashboard { background-color: #ffffff; padding: 20px 24px; transition: all 0.3s ease; z-index: 40; border-bottom: 1px solid #e5e7eb; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .progress-bar { height: 8px; background: #f1f5f9; border-radius: 4px; overflow: hidden; margin-top: 15px; border: 1px solid #e2e8f0; }
+        /* 대시보드 */
+        .dashboard-sticky { position: sticky; top: 0; z-index: 40; background: white; padding: 16px 20px; border-bottom: 1px solid #e2e8f0; box-shadow: 0 4px 15px -3px rgba(0,0,0,0.05); }
+        .progress-bar { height: 6px; background: #f1f5f9; border-radius: 4px; overflow: hidden; margin-top: 10px; border: 1px solid #e2e8f0; }
         .progress-fill { height: 100%; transition: width 1s linear, background-color 0.5s; }
 
-        .modal-overlay { background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); }
+        .modal-overlay { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); display: none; position: absolute; inset: 0; z-index: 200; align-items: center; justify-content: center; padding: 20px; }
         
-        /* 라이트모드 실사 지도 요소 */
-        .map-bg { background-color: #f8fafc; background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 20px 20px; }
-        .map-road { position: absolute; background-color: #ffffff; border-left: 2px solid #e2e8f0; border-right: 2px solid #e2e8f0; }
-        .map-building { position: absolute; background-color: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .support-zone { position: absolute; background: repeating-linear-gradient(45deg, rgba(59, 130, 246, 0.05), rgba(59, 130, 246, 0.05) 10px, rgba(59, 130, 246, 0.1) 10px, rgba(59, 130, 246, 0.1) 20px); border: 2px dashed #3b82f6; border-radius: 12px; }
+        /* ---------------- 지도 커스텀 디자인 ---------------- */
+        .map-viewport { width: 100%; height: 100%; overflow: hidden; position: relative; background: #eef2f6; cursor: grab; }
+        .map-viewport:active { cursor: grabbing; }
+        .map-canvas { width: 1500px; height: 1500px; position: absolute; transform-origin: center center; will-change: transform; transition: transform 0.05s linear; }
         
-        /* 주차장 아이콘 (특허 시각적 구분 반영) */
-        .icon-public { border-radius: 50%; border: 3px solid #2563eb; background: white; } /* 공영=원형 */
-        .icon-private { border-radius: 8px; border: 3px solid #f59e0b; background: white; } /* 민간=사각형 */
+        /* 도로망 */
+        .map-bg-grid { position: absolute; inset: 0; background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px); background-size: 30px 30px; opacity: 0.5; }
+        .road-main { position: absolute; background: #ffffff; box-shadow: inset 0 0 0 2px #e2e8f0; }
+        .road-line { position: absolute; background: transparent; border-top: 2px dashed #94a3b8; width: 100%; top: 50%; }
+        
+        /* 건물 스타일 */
+        .bldg { position: absolute; border: 1px solid #cbd5e1; border-bottom: 4px solid #94a3b8; border-right: 2px solid #cbd5e1; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; font-size: 11px; font-weight: 900; color: #334155; line-height: 1.2; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .bldg-public { background: #f8fafc; }
+        .bldg-commercial { background: #fffbeb; border-color: #fcd34d; border-bottom-color: #fbbf24; }
+        
+        /* 주차 지원 구역 (점선/해칭) */
+        .zone-public { position: absolute; border: 3px dashed #3b82f6; background: rgba(59, 130, 246, 0.05); border-radius: 16px; pointer-events: none; }
+        .zone-private { position: absolute; border: 3px dashed #f59e0b; background: rgba(245, 158, 11, 0.05); border-radius: 16px; pointer-events: none; }
+        
+        /* 마커 */
+        .marker-public { position: absolute; width: 32px; height: 32px; border-radius: 50%; background: white; border: 3px solid #2563eb; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #2563eb; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .marker-private { position: absolute; width: 32px; height: 32px; border-radius: 8px; background: white; border: 3px solid #f59e0b; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #f59e0b; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        
+        /* 내 위치 핑 */
+        .my-location { position: absolute; z-index: 50; display: flex; flex-direction: column; align-items: center; transform: translate(-50%, -50%); }
+        .my-location-dot { width: 16px; height: 16px; background: #ef4444; border: 3px solid white; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.2); position: relative; z-index: 2; }
+        .my-location-ping { position: absolute; width: 40px; height: 40px; background: rgba(239, 68, 68, 0.4); border-radius: 50%; animation: ping-slow 2s infinite cubic-bezier(0, 0, 0.2, 1); z-index: 1; top: -12px; left: -12px; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
 
-    <div id="toast-container" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col items-center pointer-events-none w-auto whitespace-nowrap"></div>
+    <div id="toast-container" class="absolute bottom-28 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col items-center pointer-events-none w-auto whitespace-nowrap"></div>
 
-    <div id="auth-modal" class="modal-overlay fixed inset-0 z-[200] hidden flex-col justify-center items-center p-6 fade-in">
-        <div class="bg-white rounded-[2rem] p-8 shadow-2xl flex flex-col items-center text-center w-72">
-            <div class="relative w-20 h-20 mb-4 flex items-center justify-center">
-                <span class="material-symbols-outlined text-blue-500 absolute animate-ping opacity-70" style="font-size: 50px;">wifi_tethering</span>
-                <span class="material-symbols-outlined text-blue-600 relative z-10" style="font-size: 40px;">satellite_alt</span>
+    <div id="auth-modal" class="modal-overlay">
+        <div class="bg-white rounded-[2.5rem] p-8 shadow-2xl flex flex-col items-center text-center w-72 slide-up">
+            <div class="relative w-24 h-24 mb-4 flex items-center justify-center">
+                <span class="material-symbols-outlined text-blue-500 absolute animate-ping opacity-60" style="font-size: 60px;">wifi_tethering</span>
+                <span class="material-symbols-outlined text-blue-700 relative z-10" style="font-size: 48px;">satellite_alt</span>
             </div>
-            <h3 class="font-black text-lg text-gray-800 mb-2">하이브리드 위치 검증 중</h3>
-            <p class="text-xs text-gray-500 font-bold">GPS 및 상점 내 비콘(Beacon) 신호를<br>교차 검증하여 체류를 확정합니다.</p>
+            <h3 class="font-black text-xl text-gray-800 mb-2">위치 기반 체류 확정 중</h3>
+            <p class="text-xs text-gray-500 font-bold leading-relaxed">GPS 및 상점 내 비콘(Beacon)<br>신호를 교차 검증하고 있습니다.</p>
         </div>
     </div>
 
-    <div id="purpose-modal" class="modal-overlay fixed inset-0 z-[200] hidden flex-col justify-center items-center p-6 fade-in">
-        <div class="bg-white rounded-[2rem] p-8 w-full max-w-sm text-center shadow-2xl">
-            <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-blue-100" style="animation: pulse-border 2s infinite;">
-                <span class="material-symbols-outlined" style="font-size: 32px;">directions_car</span>
+    <div id="loading-modal" class="modal-overlay">
+        <div class="bg-white rounded-[2.5rem] p-8 shadow-2xl flex flex-col items-center text-center w-64 slide-up">
+            <span class="material-symbols-outlined text-blue-600 animate-spin mb-4" style="font-size: 40px;">sync</span>
+            <h3 class="font-black text-lg text-gray-800 mb-1">관제망 통신 중</h3>
+            <p class="text-xs text-gray-500 font-bold">주차 데이터 동기화...</p>
+        </div>
+    </div>
+
+    <div id="purpose-modal" class="modal-overlay">
+        <div class="bg-white rounded-[2.5rem] p-8 w-full max-w-[340px] text-center shadow-2xl slide-up mx-4">
+            <div class="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-blue-100 relative">
+                <span class="material-symbols-outlined absolute inset-0 animate-ping opacity-30 text-blue-400 rounded-full" style="font-size: 80px;">circle</span>
+                <span class="material-symbols-outlined" style="font-size: 40px;">directions_car</span>
             </div>
-            <h3 class="text-xl font-black text-gray-800 mb-2">통합 주차장 입차 감지</h3>
-            <p class="text-sm text-gray-500 font-bold mb-6">김이강 님, 서구청 인근 골목상권에<br>방문하실 예정이신가요?</p>
+            <h3 class="text-2xl font-black text-gray-800 mb-2">통합 주차장 입차</h3>
+            <p class="text-sm text-gray-500 font-bold mb-6 leading-relaxed">김이강 님,<br>서구청 골목상권을 방문하시나요?</p>
             <div class="flex flex-col gap-3">
-                <button onclick="confirmPurpose(true)" class="w-full bg-[#2563eb] text-white py-4 rounded-xl font-bold shadow-md active:scale-95 transition">예, 상점가 방문 예정입니다</button>
-                <button onclick="confirmPurpose(false)" class="w-full bg-gray-100 text-gray-600 py-4 rounded-xl font-bold active:scale-95 transition">아니오, 단순 주차입니다</button>
+                <button onclick="confirmPurpose(true)" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black shadow-lg shadow-blue-200 active:scale-95 transition text-base">예, 상점가 이용 목적입니다</button>
+                <button onclick="confirmPurpose(false)" class="w-full bg-gray-100 text-gray-600 py-4 rounded-2xl font-black active:scale-95 transition text-base">아니오, 일반 주차입니다</button>
             </div>
         </div>
     </div>
 
-    <div id="checkout-modal" class="modal-overlay fixed inset-0 z-[200] hidden flex-col justify-center items-center p-6 fade-in">
-        <div class="bg-white rounded-[2rem] w-full max-w-sm p-8 shadow-2xl flex flex-col items-center text-center">
-            <h3 class="font-black text-xl text-gray-800 mb-2">차량 출차 확정</h3>
+    <div id="checkout-modal" class="modal-overlay">
+        <div class="bg-white rounded-[2.5rem] w-full max-w-[340px] p-8 shadow-2xl flex flex-col items-center text-center slide-up mx-4">
+            <h3 class="font-black text-2xl text-gray-800 mb-2">차량 출차 확정</h3>
             <p class="text-sm text-gray-500 font-bold mb-6">최종 정산 로직을 실행하시겠습니까?</p>
             <div class="w-full space-y-3">
-                <button onclick="confirmCheckout()" class="w-full bg-gray-800 text-white font-bold py-4 rounded-xl shadow-md active:scale-95 transition">정산 및 예산 환원 실행</button>
-                <button onclick="document.getElementById('checkout-modal').classList.add('hidden'); document.getElementById('checkout-modal').classList.remove('flex');" class="w-full bg-gray-100 text-gray-700 font-bold py-4 rounded-xl active:scale-95 transition">취소</button>
+                <button onclick="confirmCheckout()" class="w-full bg-gray-900 text-white font-black py-4 rounded-2xl shadow-lg active:scale-95 transition text-base">정산 및 예산 환원 실행</button>
+                <button onclick="closeModal('checkout-modal')" class="w-full bg-gray-100 text-gray-700 font-black py-4 rounded-2xl active:scale-95 transition text-base">취소</button>
             </div>
         </div>
     </div>
 
-    <div class="pt-4 pb-2 px-5 flex justify-between items-center text-xs font-bold text-gray-500 bg-white z-40">
+    <div class="pt-4 pb-2 px-5 flex justify-between items-center text-xs font-bold text-gray-500 bg-white z-40 relative">
         <span id="clock-display">12:00</span>
         <div class="flex items-center space-x-1">
             <span class="material-symbols-outlined" style="font-size: 16px;">signal_cellular_alt</span>
@@ -96,356 +126,362 @@
         </div>
     </div>
 
-    <div id="top-dashboard" class="dashboard hidden relative">
-        <div class="flex justify-between items-end relative z-10">
+    <div id="top-dashboard" class="dashboard-sticky hidden fade-in">
+        <div class="flex justify-between items-end">
             <div>
-                <p id="dash-status-txt" class="text-xs text-red-500 font-bold mb-1 flex items-center"><span class="material-symbols-outlined text-[14px] mr-1">info</span>상권 미이용 (요금 부과 대상)</p>
-                <h2 id="dash-remain" class="text-4xl font-black text-red-500 tracking-tighter">-0분 0초</h2>
+                <p id="dash-status-txt" class="text-[11px] text-red-500 font-bold mb-1 flex items-center"><span class="material-symbols-outlined text-[14px] mr-1">info</span>상권 미이용 (요금 발생 중)</p>
+                <h2 id="dash-remain" class="text-4xl font-black text-red-500 tracking-tighter" style="font-variant-numeric: tabular-nums;">-0분 0초</h2>
             </div>
             <div class="text-right">
                 <p class="text-[10px] text-gray-400 font-bold">확보 혜택: <span id="dash-support" class="text-gray-800 text-sm">0분</span></p>
                 <p class="text-[10px] text-gray-400 font-bold mt-1">경과 시간: <span id="dash-used" class="text-gray-800 text-sm">0분</span></p>
             </div>
         </div>
-        <div class="progress-bar relative z-10">
+        <div class="progress-bar">
             <div id="dash-progress" class="progress-fill bg-red-400" style="width: 100%;"></div>
         </div>
     </div>
 
-    <div class="tabs-wrapper">
+    <div class="tabs-wrapper" id="main-scroll-area">
         
-        <div id="tab-home" class="tab-content fade-in min-h-full bg-[#f8fafc]">
+        <div id="tab-home" class="tab-content fade-in min-h-full">
             
-            <div id="view-home-ready" class="p-5 pt-6">
-                <div class="flex justify-between items-center mb-6 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-                    <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-full overflow-hidden border border-gray-200 bg-gray-50 flex items-center justify-center">
-                            <img src="profile.png" alt="프로필" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%2394a3b8\'><path d=\'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z\'/></svg>';" class="w-full h-full object-cover">
-                        </div>
-                        <div>
-                            <h1 class="text-lg font-black text-gray-800">김이강 님</h1>
-                            <p class="text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-md inline-block mt-0.5">차량: 123가 4567</p>
-                        </div>
+            <div id="view-home-ready" class="p-5 pt-6 space-y-6">
+                <div class="flex items-center gap-4 mb-2 pl-2">
+                    <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center text-white font-black text-2xl shadow-md border-2 border-white">김</div>
+                    <div>
+                        <h1 class="text-2xl font-black text-gray-800 tracking-tight">반갑습니다,<br>김이강 님</h1>
                     </div>
-                    <span class="material-symbols-outlined text-gray-400">notifications</span>
                 </div>
 
-                <div class="bg-gradient-to-r from-blue-600 to-sky-400 p-5 rounded-2xl text-white shadow-lg mb-6 relative overflow-hidden">
-                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
-                    <div class="flex justify-between items-center mb-2 relative z-10">
-                        <span class="text-xs font-bold opacity-90 flex items-center"><span class="material-symbols-outlined text-[14px] mr-1">account_balance</span>서구청 주차 지원 예산 현황</span>
-                        <span class="text-[10px] font-black bg-white/20 px-2 py-1 rounded-full border border-white/30">원활 (85%)</span>
+                <div class="bg-gradient-to-r from-blue-600 to-sky-500 p-5 rounded-3xl text-white shadow-lg relative overflow-hidden">
+                    <div class="absolute -right-10 -top-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+                    <div class="flex justify-between items-end mb-3 relative z-10">
+                        <div>
+                            <span class="text-xs font-bold opacity-90 flex items-center"><span class="material-symbols-outlined text-[14px] mr-1">pie_chart</span>서구청 주차 예산 집행률</span>
+                            <div class="text-3xl font-black mt-1">24.8<span class="text-lg font-bold opacity-80">%</span></div>
+                        </div>
+                        <span class="text-[10px] font-black bg-white/20 px-2.5 py-1 rounded-lg border border-white/30">실시간 반영</span>
                     </div>
-                    <div class="w-full bg-white/20 rounded-full h-1.5 mb-1 mt-3 relative z-10">
-                        <div class="bg-white h-1.5 rounded-full" style="width: 85%"></div>
+                    <div class="w-full bg-white/20 rounded-full h-2 mb-2 relative z-10">
+                        <div class="bg-white h-2 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.8)]" style="width: 24.8%"></div>
                     </div>
-                    <p class="text-[9px] opacity-75 mt-2 relative z-10">잔여 예산: 42,150,000원 (오늘 실시간 환원액 적용됨)</p>
+                    <p class="text-[9px] opacity-80 relative z-10 leading-tight">본 서비스는 골목상권 이용자에 한해 서구청 예산으로<br>무료 주차 혜택을 통합 지원합니다.</p>
                 </div>
                 
-                <div class="grid grid-cols-4 gap-4 mb-6 px-2">
-                    <button onclick="switchTab('map', document.getElementById('nav-map'))" class="flex flex-col items-center gap-2"><div class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center border border-gray-100 active:scale-95 transition"><span class="material-symbols-outlined text-blue-500">map</span></div><span class="text-[10px] font-bold text-gray-600">주차 지도</span></button>
-                    <button onclick="switchTab('history', document.getElementById('nav-history'))" class="flex flex-col items-center gap-2"><div class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center border border-gray-100 active:scale-95 transition"><span class="material-symbols-outlined text-teal-500">receipt_long</span></div><span class="text-[10px] font-bold text-gray-600">이용 내역</span></button>
-                    <button onclick="switchTab('qr', document.getElementById('nav-qr'))" class="flex flex-col items-center gap-2"><div class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center border border-gray-100 active:scale-95 transition"><span class="material-symbols-outlined text-orange-500">qr_code_scanner</span></div><span class="text-[10px] font-bold text-gray-600">QR 혜택</span></button>
-                    <button onclick="switchTab('my', document.getElementById('nav-my'))" class="flex flex-col items-center gap-2"><div class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center border border-gray-100 active:scale-95 transition"><span class="material-symbols-outlined text-purple-500">local_activity</span></div><span class="text-[10px] font-bold text-gray-600">상권 소식</span></button>
+                <div class="grid grid-cols-4 gap-3 px-1">
+                    <button onclick="switchTab('map', document.getElementById('nav-map'))" class="flex flex-col items-center gap-2"><div class="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center border border-gray-100 active:scale-95 transition"><span class="material-symbols-outlined text-blue-500" style="font-size: 28px;">map</span></div><span class="text-[11px] font-bold text-gray-600">주차지도</span></button>
+                    <button onclick="switchTab('history', document.getElementById('nav-history'))" class="flex flex-col items-center gap-2"><div class="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center border border-gray-100 active:scale-95 transition"><span class="material-symbols-outlined text-teal-500" style="font-size: 28px;">receipt_long</span></div><span class="text-[11px] font-bold text-gray-600">이용내역</span></button>
+                    <button onclick="switchTab('qr', document.getElementById('nav-qr'))" class="flex flex-col items-center gap-2"><div class="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center border border-gray-100 active:scale-95 transition"><span class="material-symbols-outlined text-orange-500" style="font-size: 28px;">qr_code_scanner</span></div><span class="text-[11px] font-bold text-gray-600">QR공유</span></button>
+                    <button onclick="switchTab('my', document.getElementById('nav-my'))" class="flex flex-col items-center gap-2"><div class="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center border border-gray-100 active:scale-95 transition"><span class="material-symbols-outlined text-purple-500" style="font-size: 28px;">campaign</span></div><span class="text-[11px] font-bold text-gray-600">상권소식</span></button>
                 </div>
 
-                <div class="flex justify-between items-end mb-3 px-1">
-                    <h3 class="font-black text-gray-800 text-sm">서구 통합 주차 허브</h3>
-                    <span class="text-[10px] font-bold text-blue-500 cursor-pointer">지도에서 보기</span>
-                </div>
-                <div class="space-y-3">
-                    <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm flex justify-between items-center group">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 border border-blue-100"><span class="material-symbols-outlined">local_parking</span></div>
-                            <div><p class="font-bold text-gray-800 text-sm">서구청 제1 주차장</p><p class="text-[10px] text-green-600 font-bold mt-0.5">상권 연합 메인 · 혼잡</p></div>
-                        </div>
-                        <button onclick="triggerParkingCommunication('서구청 제1 주차장')" class="bg-gray-800 text-white px-4 py-2.5 rounded-xl text-xs font-bold active:scale-95 transition">입차</button>
+                <div class="pt-2">
+                    <div class="flex justify-between items-end mb-3 px-1">
+                        <h3 class="font-black text-gray-800 text-[15px]">서구 상권 통합 주차 허브</h3>
                     </div>
-                    <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm flex justify-between items-center">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-teal-50 rounded-full flex items-center justify-center text-teal-600 border border-teal-100"><span class="material-symbols-outlined">health_and_safety</span></div>
-                            <div><p class="font-bold text-gray-800 text-sm">서구보건소 주차장</p><p class="text-[10px] text-teal-600 font-bold mt-0.5">공공기관 개방 · 여유</p></div>
+                    <div class="space-y-3">
+                        <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm flex justify-between items-center group cursor-pointer active:scale-95 transition" onclick="triggerParking('서구청 제1 주차장')">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 border border-blue-100"><span class="material-symbols-outlined">local_parking</span></div>
+                                <div><p class="font-black text-[15px] text-gray-800 mb-1">서구청 제1 주차장</p><p class="text-[11px] text-gray-400 font-bold tracking-tight">총 120면 | 주차 82대 | <span class="text-blue-600">가능 38대</span></p></div>
+                            </div>
+                            <span class="bg-gray-900 text-white text-xs font-black px-4 py-2.5 rounded-xl">입차</span>
                         </div>
-                        <button onclick="triggerParkingCommunication('서구보건소 주차장')" class="bg-gray-800 text-white px-4 py-2.5 rounded-xl text-xs font-bold active:scale-95 transition">입차</button>
-                    </div>
-                    <div class="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm flex justify-between items-center">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-600 border border-indigo-100"><span class="material-symbols-outlined">account_balance</span></div>
-                            <div><p class="font-bold text-gray-800 text-sm">KJB 상생 금융 주차장</p><p class="text-[10px] text-indigo-500 font-bold mt-0.5">18:00 이후 무료 · 여유</p></div>
+                        <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm flex justify-between items-center group cursor-pointer active:scale-95 transition" onclick="triggerParking('서구보건소 주차장')">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-teal-50 rounded-full flex items-center justify-center text-teal-600 border border-teal-100"><span class="material-symbols-outlined">health_and_safety</span></div>
+                                <div><p class="font-black text-[15px] text-gray-800 mb-1">서구보건소 주차장</p><p class="text-[11px] text-gray-400 font-bold tracking-tight">총 50면 | 주차 45대 | <span class="text-teal-600">가능 5대</span></p></div>
+                            </div>
+                            <span class="bg-gray-900 text-white text-xs font-black px-4 py-2.5 rounded-xl">입차</span>
                         </div>
-                        <button onclick="triggerParkingCommunication('KJB 상생 금융 주차장')" class="bg-gray-800 text-white px-4 py-2.5 rounded-xl text-xs font-bold active:scale-95 transition">입차</button>
+                        <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm flex justify-between items-center group cursor-pointer active:scale-95 transition" onclick="triggerParking('KJB 상생 금융 주차장')">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-600 border border-indigo-100"><span class="material-symbols-outlined">account_balance</span></div>
+                                <div><p class="font-black text-[15px] text-gray-800 mb-1">KJB 상생 금융 주차장</p><p class="text-[11px] text-gray-400 font-bold tracking-tight">총 30면 | 주차 10대 | <span class="text-indigo-500">가능 20대</span></p></div>
+                            </div>
+                            <span class="bg-gray-900 text-white text-xs font-black px-4 py-2.5 rounded-xl">입차</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div id="view-home-parking" class="p-5 pt-6 hidden fade-in">
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-blue-200 text-center mb-6 relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
-                    <p class="text-[11px] text-gray-500 font-bold mb-1 flex items-center justify-center">
-                        <span class="material-symbols-outlined text-[14px] mr-1 text-blue-500">ev_station</span> 
-                        <span id="lbl-parking-name" class="font-black text-gray-700 mr-1">주차장</span> (입차 완료)
+            <div id="view-home-parking" class="p-5 pt-6 hidden fade-in space-y-6">
+                <div class="bg-white p-5 rounded-3xl shadow-sm border border-blue-200 text-center relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-blue-500"></div>
+                    <p class="text-[12px] text-gray-500 font-bold mb-1 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[16px] mr-1 text-blue-500">ev_station</span> 
+                        <span id="lbl-parking-name" class="font-black text-gray-800 mr-1 text-sm"></span> (입차 완료)
                     </p>
-                    <p class="text-sm text-blue-600 font-black tracking-tight">골목상권 하이브리드 정산 연동 중</p>
+                    <p class="text-sm text-blue-600 font-black tracking-tight">하이브리드 결제 연동 활성화</p>
                 </div>
                 
-                <h3 class="font-black text-gray-800 text-sm mb-3 px-1">방문 상점 결제 연동 (위치 인증)</h3>
-                <div class="space-y-3 mb-6">
-                    <button onclick="payMySelf(60, '다락 국밥집')" class="w-full flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl active:scale-95 transition shadow-sm">
-                        <div class="flex items-center">
-                            <div class="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center text-orange-500 mr-4"><span class="material-symbols-outlined">soup_kitchen</span></div>
-                            <div class="text-left"><p class="font-bold text-gray-800 text-sm">다락 국밥집</p><p class="text-[10px] text-gray-500 font-bold mt-0.5">결제 시연 (1시간 지원)</p></div>
-                        </div>
-                        <div class="bg-gray-50 border border-gray-200 text-gray-700 font-black text-xs px-3 py-1.5 rounded-lg">결제하기</div>
-                    </button>
-                    <button onclick="payMySelf(30, '서구청 행복 카페')" class="w-full flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl active:scale-95 transition shadow-sm">
-                        <div class="flex items-center">
-                            <div class="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center text-amber-500 mr-4"><span class="material-symbols-outlined">local_cafe</span></div>
-                            <div class="text-left"><p class="font-bold text-gray-800 text-sm">서구청 행복 카페</p><p class="text-[10px] text-gray-500 font-bold mt-0.5">결제 시연 (30분 지원)</p></div>
-                        </div>
-                        <div class="bg-gray-50 border border-gray-200 text-gray-700 font-black text-xs px-3 py-1.5 rounded-lg">결제하기</div>
-                    </button>
-                    <button onclick="payMySelf(120, '골목 상생 미용실')" class="w-full flex items-center justify-between p-4 bg-white border border-gray-200 rounded-2xl active:scale-95 transition shadow-sm">
-                        <div class="flex items-center">
-                            <div class="w-12 h-12 bg-purple-50 rounded-full flex items-center justify-center text-purple-500 mr-4"><span class="material-symbols-outlined">content_cut</span></div>
-                            <div class="text-left"><p class="font-bold text-gray-800 text-sm">골목 상생 미용실</p><p class="text-[10px] text-gray-500 font-bold mt-0.5">결제 시연 (2시간 지원)</p></div>
-                        </div>
-                        <div class="bg-gray-50 border border-gray-200 text-gray-700 font-black text-xs px-3 py-1.5 rounded-lg">결제하기</div>
-                    </button>
+                <div>
+                    <h3 class="font-black text-gray-800 text-[15px] mb-3 px-1">방문 상점 결제 연동 시뮬레이션</h3>
+                    <div class="space-y-3">
+                        <button onclick="payMySelf(60, '다락 국밥집')" class="w-full flex items-center justify-between p-5 bg-white border border-gray-200 rounded-3xl active:scale-95 transition shadow-sm">
+                            <div class="flex items-center">
+                                <div class="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-500 mr-4"><span class="material-symbols-outlined" style="font-size: 28px;">soup_kitchen</span></div>
+                                <div class="text-left"><p class="font-black text-gray-800 text-base mb-1">다락 국밥집</p><p class="text-[11px] text-gray-500 font-bold">결제 시연 (1시간 지원)</p></div>
+                            </div>
+                            <div class="bg-gray-50 border border-gray-200 text-gray-700 font-black text-xs px-4 py-2 rounded-xl">결제</div>
+                        </button>
+                        <button onclick="payMySelf(30, '서구청 행복 카페')" class="w-full flex items-center justify-between p-5 bg-white border border-gray-200 rounded-3xl active:scale-95 transition shadow-sm">
+                            <div class="flex items-center">
+                                <div class="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-500 mr-4"><span class="material-symbols-outlined" style="font-size: 28px;">local_cafe</span></div>
+                                <div class="text-left"><p class="font-black text-gray-800 text-base mb-1">서구청 행복 카페</p><p class="text-[11px] text-gray-500 font-bold">결제 시연 (30분 지원)</p></div>
+                            </div>
+                            <div class="bg-gray-50 border border-gray-200 text-gray-700 font-black text-xs px-4 py-2 rounded-xl">결제</div>
+                        </button>
+                        <button onclick="payMySelf(120, '슈퍼마켓 비타민')" class="w-full flex items-center justify-between p-5 bg-white border border-gray-200 rounded-3xl active:scale-95 transition shadow-sm">
+                            <div class="flex items-center">
+                                <div class="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center text-green-600 mr-4"><span class="material-symbols-outlined" style="font-size: 28px;">shopping_basket</span></div>
+                                <div class="text-left"><p class="font-black text-gray-800 text-base mb-1">슈퍼마켓 비타민</p><p class="text-[11px] text-gray-500 font-bold">결제 시연 (2시간 지원)</p></div>
+                            </div>
+                            <div class="bg-gray-50 border border-gray-200 text-gray-700 font-black text-xs px-4 py-2 rounded-xl">결제</div>
+                        </button>
+                    </div>
                 </div>
 
-                <button onclick="openCheckoutModal()" class="w-full py-4 mt-8 bg-[#0A2540] text-white rounded-2xl font-bold flex items-center justify-center shadow-lg active:scale-95 transition text-sm">
+                <div class="bg-gray-100 rounded-2xl p-5 text-center border border-gray-200">
+                    <p class="text-xs font-black text-gray-600 mb-2">일행이 상점을 결제하셨나요?</p>
+                    <button onclick="switchTab('qr', document.getElementById('nav-qr'))" class="w-full bg-white border border-gray-300 text-gray-800 text-sm font-black py-3.5 rounded-xl shadow-sm active:scale-95 transition">QR 스캔하고 혜택 공유받기</button>
+                </div>
+
+                <button onclick="openCheckoutModal()" class="w-full py-5 bg-gray-900 text-white rounded-2xl font-black shadow-lg active:scale-95 transition text-base flex items-center justify-center">
                     <span class="material-symbols-outlined mr-2">logout</span> 출차 및 잔여시간 정산
                 </button>
             </div>
 
-            <div id="view-home-receipt" class="p-6 hidden fade-in flex-col pt-10 bg-slate-50 min-h-full">
+            <div id="view-home-receipt" class="p-6 hidden fade-in flex-col pt-10 min-h-full">
                 <div class="flex flex-col items-center">
-                    <div class="w-20 h-20 bg-blue-50 border-4 border-white rounded-full flex items-center justify-center text-blue-500 mb-4 shadow-md">
-                        <span class="material-symbols-outlined" style="font-size: 40px;">task_alt</span>
+                    <div class="w-24 h-24 bg-blue-50 border-4 border-white rounded-full flex items-center justify-center text-blue-600 mb-6 shadow-lg">
+                        <span class="material-symbols-outlined" style="font-size: 50px;">task_alt</span>
                     </div>
-                    <h2 class="text-2xl font-black text-gray-800 mb-6 tracking-tight">주차 정산 완료</h2>
+                    <h2 class="text-3xl font-black text-gray-800 mb-8 tracking-tight">주차 정산 완료</h2>
                     
-                    <div class="w-full bg-white p-6 rounded-3xl shadow-sm border border-gray-200 relative overflow-hidden">
+                    <div class="w-full bg-white p-7 rounded-[2rem] shadow-sm border border-gray-200 relative overflow-hidden">
                         <div class="absolute top-0 left-0 w-full h-2 bg-blue-600"></div>
-                        <div class="flex justify-between items-center text-sm mb-3 mt-2">
+                        <div class="flex justify-between items-center text-sm mb-4 mt-2">
                             <span class="text-gray-500 font-bold">방문 상점</span>
                             <span id="rcpt-stores" class="font-black text-gray-800 text-right w-1/2 break-words">없음</span>
                         </div>
-                        <div class="w-full h-px bg-gray-100 my-3"></div>
-                        <div class="flex justify-between items-center text-sm mb-3">
+                        <div class="w-full h-px bg-gray-100 my-4"></div>
+                        <div class="flex justify-between items-center text-[15px] mb-4">
                             <span class="text-gray-500 font-bold">확보한 주차 혜택</span>
                             <span id="rcpt-support" class="font-black text-blue-600">0분</span>
                         </div>
-                        <div class="flex justify-between items-center text-sm mb-4">
+                        <div class="flex justify-between items-center text-[15px] mb-6">
                             <span class="text-gray-500 font-bold">실제 주차장 체류 시간</span>
                             <span id="rcpt-used" class="font-black text-red-500">- 0분</span>
                         </div>
-                        <div class="w-full h-px bg-gray-200 my-5 border-t border-dashed"></div>
+                        <div class="w-full h-px bg-gray-200 my-6 border-t border-dashed"></div>
                         
-                        <div id="rcpt-result-box" class="flex justify-between items-center p-5 rounded-xl shadow-inner">
+                        <div id="rcpt-result-box" class="flex justify-between items-center p-6 rounded-2xl shadow-inner">
                             <div>
-                                <span id="rcpt-result-title" class="block font-black text-sm">서구청 예산 환원</span>
-                                <span id="rcpt-result-desc" class="block text-[10px] mt-1 font-bold">미사용 시간 반납</span>
+                                <span id="rcpt-result-title" class="block font-black text-base">서구청 예산 환원</span>
+                                <span id="rcpt-result-desc" class="block text-xs mt-1 font-bold">미사용 시간 반납</span>
                             </div>
-                            <span id="rcpt-refund" class="text-3xl font-black tracking-tighter">0분</span>
+                            <span id="rcpt-refund" class="text-4xl font-black tracking-tighter" style="font-variant-numeric: tabular-nums;">0분</span>
                         </div>
                     </div>
 
-                    <div class="bg-gray-100 rounded-2xl p-4 text-center mt-4 w-full border border-gray-200">
-                        <p id="rcpt-refund-txt" class="text-[11px] text-gray-600 leading-relaxed font-bold"></p>
+                    <div class="bg-gray-100 rounded-2xl p-5 text-center mt-6 w-full border border-gray-200">
+                        <p id="rcpt-refund-txt" class="text-xs text-gray-600 leading-relaxed font-bold"></p>
                     </div>
                     
-                    <button onclick="resetApp()" class="w-full mt-6 py-4 bg-white border border-gray-300 text-gray-700 font-black rounded-2xl shadow-sm active:scale-95 transition text-sm">포털 홈으로 가기</button>
+                    <button onclick="resetApp()" class="w-full mt-8 py-5 bg-white border border-gray-300 text-gray-800 font-black rounded-2xl shadow-sm active:scale-95 transition text-base">포털 홈으로 돌아가기</button>
                 </div>
             </div>
         </div>
 
-        <div id="tab-map" class="tab-content hidden h-full flex flex-col fade-in bg-white">
+        <div id="tab-map" class="tab-content hidden h-full flex flex-col fade-in">
             <div class="absolute top-0 left-0 w-full p-4 pt-6 z-30 flex justify-between items-center pointer-events-none bg-gradient-to-b from-white/90 to-transparent">
-                <h2 class="font-black text-lg text-gray-800 px-2 drop-shadow-sm">서구청 중심 상권 지도</h2>
-                <button class="bg-white p-2.5 rounded-full pointer-events-auto shadow-md border border-gray-100 text-blue-600"><span class="material-symbols-outlined" style="font-size:20px;">my_location</span></button>
+                <h2 class="font-black text-xl text-gray-800 px-2 drop-shadow-md">서구청 중심 상권 지도</h2>
+                <button class="bg-white p-3 rounded-full pointer-events-auto shadow-lg border border-gray-100 text-blue-600" onclick="resetMapPosition()"><span class="material-symbols-outlined" style="font-size:24px;">my_location</span></button>
             </div>
             
-            <div class="flex-1 map-bg relative overflow-hidden">
-                <div class="map-road w-[150%] h-[50px] top-[55%] left-[-20%] transform rotate-[-30deg]"></div>
-                <div class="map-subway w-[150%] top-[60%] left-[-20%] transform rotate-[-30deg]"></div>
-                <div class="absolute top-[63%] left-[45%] bg-[#22c55e] border-2 border-white rounded-full w-5 h-5 z-10 shadow-md flex justify-center items-center"><span class="material-symbols-outlined text-white" style="font-size:12px;">subway</span></div>
-                
-                <div class="map-building w-40 h-32 top-[10%] left-[50%] opacity-90 z-10">
-                    <span class="material-symbols-outlined text-gray-500 mb-1" style="font-size: 28px;">account_balance</span>
-                    <span class="text-[10px] text-gray-700 font-black text-center leading-tight">광주광역시<br>서구청</span>
-                    <div class="absolute -bottom-4 -left-4 w-12 h-12 icon-public flex flex-col items-center justify-center shadow-lg animate-bounce">
-                        <span class="text-[14px] text-blue-600 font-black">P</span>
-                        <span class="text-[7px] text-gray-600 font-bold">공영</span>
-                    </div>
-                </div>
-
-                <div class="map-building w-28 h-20 top-[15%] left-[5%] opacity-90 z-10">
-                    <span class="material-symbols-outlined text-teal-500 mb-1">local_hospital</span>
-                    <span class="text-[9px] text-gray-700 font-black">서구보건소</span>
-                    <div class="absolute -bottom-3 -right-3 w-8 h-8 icon-public flex flex-col items-center justify-center shadow-md">
-                        <span class="text-[12px] text-blue-600 font-black">P</span>
-                    </div>
-                </div>
-
-                <div class="map-building w-32 h-16 bottom-[10%] left-[35%] opacity-90 z-10">
-                    <span class="text-[9px] text-gray-700 font-black text-center">KJB 광주은행<br>슈퍼마켓 비타민</span>
-                    <div class="absolute -top-4 -right-4 w-10 h-10 icon-private flex flex-col items-center justify-center shadow-md">
-                        <span class="text-[14px] text-amber-500 font-black">P</span>
-                        <span class="text-[7px] text-gray-600 font-bold">민간</span>
-                    </div>
-                </div>
-
-                <div class="support-zone bottom-[10%] left-[2%] w-28 h-40 z-0 flex flex-col items-center justify-center p-2">
-                    <span class="text-blue-700 text-[9px] font-black bg-white/90 px-2 py-1 rounded shadow-sm border border-blue-200 mb-2 text-center leading-tight">골목상권 상생 구역<br>(주차비 지원)</span>
+            <div class="map-viewport" id="map-viewport">
+                <div class="map-canvas map-bg-grid" id="map-canvas">
                     
-                    <div class="flex gap-2 mb-2">
-                        <div class="bg-amber-100 border border-amber-300 rounded-full w-6 h-6 flex justify-center items-center shadow-sm"><span class="material-symbols-outlined text-amber-600" style="font-size:12px;">local_cafe</span></div>
-                        <div class="bg-orange-100 border border-orange-300 rounded-full w-6 h-6 flex justify-center items-center shadow-sm"><span class="material-symbols-outlined text-orange-600" style="font-size:12px;">restaurant</span></div>
+                    <div class="road-main w-[1500px] h-[70px] top-[700px] left-[0px] transform rotate-[-20deg]">
+                        <div class="road-line"></div>
                     </div>
-                    <div class="bg-purple-100 border border-purple-300 rounded-full w-6 h-6 flex justify-center items-center shadow-sm"><span class="material-symbols-outlined text-purple-600" style="font-size:12px;">content_cut</span></div>
+                    <div class="road-main w-[60px] h-[1500px] top-[0px] left-[700px] transform rotate-[15deg]">
+                        <div class="road-line" style="border-top: none; border-left: 2px dashed #94a3b8; height: 100%; width: 0; left: 50%;"></div>
+                    </div>
+                    
+                    <div class="zone-public w-[450px] h-[500px] top-[200px] left-[650px] transform rotate-[10deg]">
+                        <span class="absolute -top-6 left-10 bg-blue-600 text-white text-[11px] px-3 py-1 rounded-full font-bold">공영 통합 정산 구역 A</span>
+                    </div>
+                    
+                    <div class="zone-private w-[450px] h-[300px] top-[850px] left-[300px] transform rotate-[-10deg]">
+                        <span class="absolute -top-6 left-10 bg-amber-500 text-white text-[11px] px-3 py-1 rounded-full font-bold">민간 상생 정산 구역 B</span>
+                    </div>
+
+                    <div class="bldg bldg-public w-[200px] h-[150px] top-[300px] left-[850px]" style="z-index: 10;">
+                        <span class="material-symbols-outlined text-gray-400 mb-1" style="font-size: 32px;">account_balance</span>
+                        <span class="text-[13px]">광주광역시 서구청</span>
+                    </div>
+                    <div class="bldg bldg-public w-[120px] h-[80px] top-[480px] left-[800px]" style="z-index: 10;">민원봉사과</div>
+                    <div class="bldg bldg-public w-[160px] h-[120px] top-[350px] left-[550px]" style="z-index: 10;">
+                        <span class="material-symbols-outlined text-teal-500 mb-1" style="font-size: 24px;">local_hospital</span>
+                        <span class="text-[12px]">서구보건소</span>
+                    </div>
+                    <div class="bldg bldg-public w-[180px] h-[100px] top-[880px] left-[550px]" style="z-index: 10;">
+                        <span class="text-[12px]">KJB 광주은행<br>& 슈퍼마켓 비타민</span>
+                    </div>
+
+                    <div class="bldg bldg-commercial w-[90px] h-[70px] top-[260px] left-[780px]" style="z-index: 5;">행복 식당</div>
+                    <div class="bldg bldg-commercial w-[70px] h-[80px] top-[220px] left-[890px]" style="z-index: 5;">골목 약국</div>
+                    <div class="bldg bldg-commercial w-[100px] h-[60px] top-[490px] left-[950px]" style="z-index: 5;">서구 할인마트</div>
+                    <div class="bldg bldg-commercial w-[80px] h-[80px] top-[500px] left-[700px]" style="z-index: 5;">달콤 제과점</div>
+                    <div class="bldg bldg-commercial w-[90px] h-[90px] top-[280px] left-[650px]" style="z-index: 5;">상생 세탁소</div>
+
+                    <div class="bldg bldg-commercial w-[100px] h-[100px] top-[850px] left-[350px]" style="z-index: 5;">다락 국밥</div>
+                    <div class="bldg bldg-commercial w-[90px] h-[90px] top-[980px] left-[400px]" style="z-index: 5;">행복 카페</div>
+                    <div class="bldg bldg-commercial w-[110px] h-[110px] top-[1000px] left-[250px]" style="z-index: 5;">골목 상생 미용실</div>
+                    <div class="bldg bldg-commercial w-[80px] h-[80px] top-[750px] left-[400px]" style="z-index: 5;">든든 곰탕</div>
+
+                    <div class="marker-public top-[420px] left-[800px]" style="z-index: 20;">P</div>
+                    <div class="marker-public top-[440px] left-[680px]" style="z-index: 20;">P</div>
+                    <div class="marker-private top-[900px] left-[700px]" style="z-index: 20;">P</div>
+
+                    <div class="my-location top-[780px] left-[650px]">
+                        <div class="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded font-black mb-1 shadow-md">현재 위치</div>
+                        <div class="my-location-dot"></div>
+                        <div class="my-location-ping"></div>
+                    </div>
                 </div>
-                
-                <div class="absolute bottom-20 right-4 bg-white/90 p-2 rounded-lg border border-gray-200 shadow-md z-20">
-                    <p class="text-[8px] font-bold text-gray-500 mb-1">지도 범례</p>
-                    <div class="flex items-center gap-1 mb-1"><div class="w-3 h-3 rounded-full border-2 border-blue-600"></div><span class="text-[9px] text-gray-700">공영 (통합)</span></div>
-                    <div class="flex items-center gap-1"><div class="w-3 h-3 rounded border-2 border-amber-500"></div><span class="text-[9px] text-gray-700">민간 (협력)</span></div>
-                </div>
+            </div>
+            
+            <div class="absolute bottom-28 left-1/2 transform -translate-x-1/2 bg-gray-900/70 backdrop-blur-sm text-white text-[10px] font-bold px-4 py-1.5 rounded-full z-30 pointer-events-none">
+                두 손가락으로 줌인/줌아웃 하세요
             </div>
         </div>
 
-        <div id="tab-history" class="tab-content hidden p-6 pt-8 fade-in bg-gray-50 min-h-full">
-            <h2 class="font-black text-2xl text-gray-800 mb-6 flex items-center"><span class="material-symbols-outlined text-teal-500 mr-2 text-3xl">receipt_long</span>이용 내역</h2>
-            
+        <div id="tab-history" class="tab-content hidden p-5 pt-8 fade-in min-h-full">
+            <h2 class="font-black text-2xl text-gray-800 mb-6 flex items-center"><span class="material-symbols-outlined text-teal-500 mr-2" style="font-size:30px;">receipt_long</span>상세 이용 내역</h2>
             <div id="history-list" class="space-y-4 pb-10">
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 relative overflow-hidden opacity-70">
-                    <div class="absolute top-0 left-0 w-1 h-full bg-blue-400"></div>
-                    <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
-                        <span class="text-xs font-bold text-gray-500 flex items-center"><span class="material-symbols-outlined text-[16px] mr-1">event_available</span> 10월 12일</span>
-                        <span class="text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded-md">정산 완료</span>
+                <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm opacity-70">
+                    <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-50">
+                        <span class="text-[11px] font-black text-gray-400">정산 완료 | 2026.04.10</span>
                     </div>
-                    <h3 class="font-bold text-gray-800 mb-1 text-sm">서구청 통합 허브 주차장</h3>
-                    <p class="text-[10px] text-blue-500 font-bold mb-4">방문 상점: 다락 국밥집</p>
-                    <div class="flex justify-between text-xs mb-2"><span class="text-gray-500 font-bold">확보 시간</span><span class="font-black text-gray-800">60분</span></div>
-                    <div class="flex justify-between text-xs mb-4"><span class="text-gray-500 font-bold">실제 체류 시간</span><span class="font-black text-gray-800">45분</span></div>
-                    <div class="bg-blue-50 p-3 rounded-xl flex justify-between items-center border border-blue-100">
-                        <span class="text-[10px] font-bold text-blue-800">서구청 예산 자동 환원</span><span class="font-black text-blue-600 text-sm">15분</span>
+                    <h4 class="font-black text-gray-800 mb-2 text-base">서구청 제1 주차장</h4>
+                    <div class="space-y-1.5 text-[11px] font-bold text-gray-500 mb-5">
+                        <p>입차: 12:30:15 / 출차: 13:15:20</p>
+                        <p>방문 상점: 다락 국밥집, 서구청 행복 카페</p>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-xl flex justify-between items-center">
+                        <div><p class="text-[11px] text-blue-800 font-black">서구청 예산 자동 환원</p><p class="text-[10px] text-blue-600 mt-0.5 font-bold">미사용 혜택 15분 회수됨</p></div>
+                        <span class="text-xl font-black text-blue-600">15분</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div id="tab-qr" class="tab-content hidden h-full flex flex-col fade-in bg-gray-50 overflow-y-auto pb-20">
-            <div class="p-6 pt-8 bg-white border-b border-gray-200 mb-4 shadow-sm">
+        <div id="tab-qr" class="tab-content hidden h-full flex flex-col fade-in overflow-y-auto pb-20">
+            <div class="p-6 pt-8 bg-white border-b border-gray-100 mb-4">
                 <h2 class="font-black text-2xl text-gray-800 flex items-center mb-2"><span class="material-symbols-outlined text-orange-500 mr-2" style="font-size:32px;">qr_code_scanner</span>동행인 QR 공유</h2>
-                <p class="text-[11px] text-gray-500 font-bold">내가 결제한 혜택을 나누거나, 일행의 혜택을 가져옵니다.</p>
+                <p class="text-xs text-gray-500 font-bold leading-relaxed">내가 결제한 혜택을 나누거나,<br>일행이 결제한 혜택을 내 차로 가져옵니다.</p>
             </div>
             
-            <div class="px-6 space-y-6">
-                <div class="bg-gray-800 rounded-3xl p-6 relative overflow-hidden shadow-lg">
+            <div class="px-5 space-y-5">
+                <div class="bg-gray-900 rounded-[2rem] p-7 relative overflow-hidden shadow-xl">
                     <div class="absolute -right-10 -top-10 w-32 h-32 bg-white/5 rounded-full blur-xl"></div>
-                    <h3 class="text-white font-bold text-base mb-1 relative z-10 flex items-center"><span class="material-symbols-outlined text-sm mr-1 text-orange-400">photo_camera</span>카메라 스캔</h3>
-                    <p class="text-gray-400 text-[10px] font-bold mb-4 relative z-10">일행의 결제 QR을 스캔하세요.</p>
+                    <h3 class="text-white font-black text-lg mb-1 relative z-10 flex items-center"><span class="material-symbols-outlined mr-2 text-orange-400">photo_camera</span>일행 QR 스캔</h3>
+                    <p class="text-gray-400 text-xs font-bold mb-6 relative z-10">친구가 결제한 QR을 스캔하세요.</p>
                     
-                    <button onclick="simulateScanFriend(60, '서구청 행복 카페 (일행 결제)')" class="w-full bg-white text-gray-800 font-black py-4 rounded-xl shadow-md active:scale-95 transition text-sm flex items-center justify-center relative z-10">
-                        [시연용] QR 스캔 성공 처리
+                    <button onclick="simulateScanFriend(60, '서구청 행복 카페 (일행 결제)')" class="w-full bg-white text-gray-900 font-black py-4 rounded-2xl active:scale-95 transition text-sm relative z-10">
+                        카메라 스캔 완료 시연
                     </button>
                 </div>
 
-                <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-200">
-                    <h3 class="text-gray-800 font-black text-base mb-1 flex items-center"><span class="material-symbols-outlined text-sm mr-1 text-blue-500">share</span>내 주차권 공유</h3>
-                    <p class="text-gray-500 text-[10px] font-bold mb-4">현재 확보한 혜택을 일행 차량과 연동합니다.</p>
+                <div class="bg-white rounded-[2rem] p-7 border border-gray-200 shadow-sm">
+                    <h3 class="text-gray-800 font-black text-lg mb-1 flex items-center"><span class="material-symbols-outlined mr-2 text-blue-500">share</span>내 혜택 공유하기</h3>
+                    <p class="text-gray-500 text-xs font-bold mb-6">현재 확보한 혜택을 일행 차량과 연동합니다.</p>
                     
-                    <div class="bg-gray-50 rounded-2xl p-5 flex flex-col items-center border border-gray-100 mb-4">
-                        <div class="w-32 h-32 border-2 border-gray-300 rounded-xl p-2 bg-white mb-3 flex items-center justify-center">
-                            <span class="material-symbols-outlined text-gray-800 opacity-80" style="font-size: 100px;">qr_code_2</span>
+                    <div class="bg-gray-50 rounded-3xl p-6 flex flex-col items-center border border-gray-100 mb-6">
+                        <div class="w-40 h-40 border-2 border-gray-300 rounded-2xl p-2 bg-white mb-4 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-gray-800 opacity-80" style="font-size: 130px;">qr_code_2</span>
                         </div>
-                        <div class="flex items-center justify-center gap-2 bg-white rounded-lg p-2 px-4 border border-gray-200 w-full">
-                            <span class="material-symbols-outlined text-[14px] text-red-500">lock_clock</span>
+                        <div class="flex items-center justify-center gap-2 bg-white rounded-xl p-3 w-full border border-gray-200">
+                            <span class="material-symbols-outlined text-[16px] text-red-500">lock_clock</span>
                             <span class="text-xs font-bold text-gray-600">보안 유효 시간</span>
-                            <span id="qr-timer" class="text-red-500 font-black text-sm">29초</span>
+                            <span id="qr-timer" class="text-red-500 font-black text-base">29초</span>
                         </div>
                     </div>
 
-                    <div class="bg-red-50 border border-red-100 rounded-xl p-4 mt-6">
-                        <h4 class="text-[10px] font-black text-red-600 mb-2 flex items-center"><span class="material-symbols-outlined text-[14px] mr-1">warning</span>결제 취소 감지 모듈 (특허 로직 시연)</h4>
-                        <p class="text-[9px] text-red-500 font-bold mb-3">대표자가 결제를 취소하면 연동된 모든 일행의 주차 혜택이 실시간으로 일괄 폐기됩니다.</p>
-                        <button onclick="cancelPayment()" class="w-full bg-red-500 text-white font-bold py-3 rounded-lg text-xs shadow-sm active:scale-95 transition">대표 결제 취소 (혜택 일괄 회수)</button>
+                    <div class="bg-red-50 border border-red-100 rounded-2xl p-5">
+                        <h4 class="text-xs font-black text-red-600 mb-2 flex items-center"><span class="material-symbols-outlined text-[16px] mr-1">warning</span>결제 취소 감지 모듈</h4>
+                        <p class="text-[10px] text-red-500 font-bold mb-4 leading-relaxed">대표자가 결제를 취소하면 연동된 모든 일행의 주차 혜택이 실시간으로 일괄 폐기됩니다.</p>
+                        <button onclick="cancelPayment()" class="w-full bg-red-500 text-white font-black py-3.5 rounded-xl shadow-sm active:scale-95 transition text-sm">결제 취소 (혜택 일괄 무효화)</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div id="tab-my" class="tab-content hidden p-6 pt-8 fade-in bg-[#f8fafc] min-h-full">
-            <h2 class="font-black text-2xl text-gray-800 mb-6 flex items-center"><span class="material-symbols-outlined text-purple-500 mr-2 text-3xl">local_activity</span>마이 페이지</h2>
+        <div id="tab-my" class="tab-content hidden p-5 pt-8 fade-in min-h-full">
+            <h2 class="font-black text-2xl text-gray-800 mb-6 flex items-center"><span class="material-symbols-outlined text-purple-500 mr-2" style="font-size:30px;">campaign</span>상권 소식 & 마이</h2>
             
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-200 relative overflow-hidden mb-4">
-                <div class="flex items-center gap-4">
-                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center overflow-hidden border border-gray-200">
-                        <img src="profile.png" alt="프로필" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%2394a3b8\'><path d=\'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z\'/></svg>';" class="w-full h-full object-cover">
-                    </div>
-                    <div>
-                        <h3 class="font-black text-lg text-gray-800">김이강 <span class="text-xs font-bold text-gray-500">님</span></h3>
-                        <p class="text-[10px] text-white font-bold bg-gray-800 px-2 py-0.5 rounded mt-1 inline-block">서구 상권 연합 조합원</p>
-                    </div>
+            <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 mb-5 flex items-center gap-5">
+                <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center text-white font-black text-3xl shadow-sm border-2 border-blue-100">김</div>
+                <div>
+                    <h3 class="font-black text-xl text-gray-800 mb-1">김이강 <span class="text-sm font-bold text-gray-500">님</span></h3>
+                    <p class="text-[11px] text-blue-600 font-black bg-blue-50 px-2.5 py-1 rounded-md inline-block">풍암동 상권 연합 조합원</p>
                 </div>
             </div>
 
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 space-y-4 mb-4">
-                <div class="flex justify-between items-center">
-                    <span class="text-xs font-bold text-gray-400">기본 등록 차량</span>
-                    <span class="text-sm font-black text-gray-800 bg-gray-50 border border-gray-200 px-3 py-1 rounded-lg">123가 4567</span>
+            <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 space-y-5 mb-5">
+                <div class="flex justify-between items-center border-b border-gray-50 pb-4">
+                    <span class="text-sm font-bold text-gray-500">기본 등록 차량</span>
+                    <span class="text-base font-black text-gray-800 bg-gray-50 px-3 py-1 rounded-lg">123가 4567</span>
                 </div>
                 <div class="flex justify-between items-center">
-                    <span class="text-xs font-bold text-gray-400">연결 휴대전화</span>
-                    <span class="text-xs font-bold text-gray-700">010-****-5678</span>
+                    <span class="text-sm font-bold text-gray-500">연결 휴대전화</span>
+                    <span class="text-sm font-black text-gray-700">010-****-5678</span>
                 </div>
             </div>
 
-            <div class="bg-gradient-to-r from-purple-500 to-indigo-500 rounded-2xl p-5 text-white shadow-md">
-                <h4 class="font-black text-sm mb-1">상권 할인 혜택 알림</h4>
-                <p class="text-[10px] opacity-90">이번 주 금호동 골목상권에서 식사 후<br>주차 정산 시 추가 10% 할인이 적용됩니다.</p>
+            <div class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-[2rem] p-6 text-white shadow-lg">
+                <h4 class="font-black text-base mb-2 flex items-center"><span class="material-symbols-outlined text-[18px] mr-1">stars</span>이달의 상생 특별 포인트</h4>
+                <p class="text-xs font-bold opacity-90 leading-relaxed mb-4">이번 주 금호동 골목상권에서 식사 후<br>주차 정산 시 추가 10% 할인이 적용됩니다.</p>
+                <div class="bg-white/20 rounded-xl p-3 text-center font-black text-lg">1,250 P 보유중</div>
             </div>
         </div>
 
     </div>
 
     <div class="bottom-nav">
-        <button id="nav-home" class="nav-btn active" onclick="switchTab('home', this)">
-            <span class="material-symbols-outlined">directions_car</span><span class="mt-1">주차</span>
-        </button>
-        <button id="nav-map" class="nav-btn" onclick="switchTab('map', this)">
-            <span class="material-symbols-outlined">map</span><span class="mt-1">지도</span>
-        </button>
-        <button id="nav-qr" class="nav-btn" onclick="switchTab('qr', this)">
-            <span class="material-symbols-outlined">qr_code_scanner</span><span class="mt-1">QR공유</span>
-        </button>
-        <button id="nav-history" class="nav-btn" onclick="switchTab('history', this)">
-            <span class="material-symbols-outlined">receipt_long</span><span class="mt-1">내역</span>
-        </button>
-        <button id="nav-my" class="nav-btn" onclick="switchTab('my', this)">
-            <span class="material-symbols-outlined">local_activity</span><span class="mt-1">마이</span>
-        </button>
+        <button id="nav-home" class="nav-btn active" onclick="switchTab('home', this)"><span class="material-symbols-outlined">home</span><span class="mt-1">홈</span></button>
+        <button id="nav-map" class="nav-btn" onclick="switchTab('map', this)"><span class="material-symbols-outlined">map</span><span class="mt-1">주차지도</span></button>
+        <button id="nav-qr" class="nav-btn" onclick="switchTab('qr', this)"><span class="material-symbols-outlined">qr_code_scanner</span><span class="mt-1">QR공유</span></button>
+        <button id="nav-history" class="nav-btn" onclick="switchTab('history', this)"><span class="material-symbols-outlined">receipt_long</span><span class="mt-1">이용내역</span></button>
+        <button id="nav-my" class="nav-btn" onclick="switchTab('my', this)"><span class="material-symbols-outlined">person</span><span class="mt-1">마이</span></button>
     </div>
 
 </div>
 
 <script>
-    // 상태 변수
+    /* ==========================================
+       글로벌 변수 및 타이머 로직
+       ========================================== */
     let supportMinutes = 0;
     let usedSeconds = 0;  
     let parkingState = 'ready'; 
     let isVisiting = false; 
     let timerInterval = null;
     let visitedStores = [];
+    let entryTimeStr = "";
 
-    // 시계 및 보안 타이머
+    // 시스템 시계
     setInterval(() => {
         const now = new Date();
         document.getElementById('clock-display').innerText = 
             now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
     }, 1000);
 
+    // QR 보안 타이머
     let qrTime = 29;
     setInterval(() => {
         qrTime--;
@@ -454,16 +490,15 @@
         if(target) target.innerText = qrTime + '초';
     }, 1000);
 
-    // 토스트 팝업 (알림)
+    // 토스트 알림
     function showToast(message, isError = false) {
         const container = document.getElementById('toast-container');
         const toast = document.createElement('div');
         let bgClass = isError ? 'bg-red-600' : 'bg-gray-800';
         let icon = isError ? 'warning' : 'verified_user';
-        let colorClass = isError ? 'text-white' : 'text-[#00D4FF]';
         
-        toast.className = `${bgClass} backdrop-blur-sm text-white text-[11px] font-bold px-5 py-3 rounded-full shadow-lg mt-2 fade-in flex items-center justify-center`;
-        toast.innerHTML = `<span class="material-symbols-outlined ${colorClass} mr-2" style="font-size: 16px;">${icon}</span> <span>${message}</span>`;
+        toast.className = `${bgClass} backdrop-blur-md text-white text-[12px] font-bold px-6 py-4 rounded-full shadow-xl mt-3 fade-in flex items-center justify-center`;
+        toast.innerHTML = `<span class="material-symbols-outlined text-white mr-2" style="font-size: 18px;">${icon}</span> <span>${message}</span>`;
         container.appendChild(toast);
         setTimeout(() => {
             toast.style.opacity = '0';
@@ -473,116 +508,191 @@
         }, 2500);
     }
 
-    // 탭 전환
+    // 탭 전환 (버그 완벽 수정)
     function switchTab(tabId, btnElement) {
-        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-        btnElement.classList.add('active');
+        if(btnElement) {
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+        }
+        
+        // 모든 탭 숨기기
         document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
 
         if(tabId === 'home') {
+            // 홈 상태 복구
             if(parkingState === 'ready') document.getElementById('view-home-ready').classList.remove('hidden');
             else if(parkingState === 'parking') document.getElementById('view-home-parking').classList.remove('hidden');
             else if(parkingState === 'receipt') document.getElementById('view-home-receipt').classList.remove('hidden');
             document.getElementById('tab-home').classList.remove('hidden');
         } else {
             document.getElementById('tab-' + tabId).classList.remove('hidden');
+            if(tabId === 'map') resetMapPosition();
         }
     }
 
-    // 입차 및 모달
-    function triggerParkingCommunication(lotName) {
-        document.getElementById('loading-modal').classList.remove('hidden');
-        document.getElementById('loading-modal').classList.add('flex');
+    /* ==========================================
+       지도 드래그 & 줌인/아웃 로직 
+       ========================================== */
+    const mapCanvas = document.getElementById('map-canvas');
+    const mapViewport = document.getElementById('map-viewport');
+    
+    let isDragging = false;
+    let currentX = -500; 
+    let currentY = -250; 
+    let currentScale = 1;
+    let startX, startY;
+    let initialDistance = null;
+    let initialScale = 1;
+
+    // 맵 위치 렌더링
+    function updateMapTransform() {
+        mapCanvas.style.transform = `translate(${currentX}px, ${currentY}px) scale(${currentScale})`;
+    }
+
+    // 초기화
+    function resetMapPosition() {
+        currentX = -500; currentY = -250; currentScale = 1;
+        mapCanvas.style.transition = "transform 0.3s ease-out";
+        updateMapTransform();
+        setTimeout(() => { mapCanvas.style.transition = "none"; }, 300);
+    }
+    
+    resetMapPosition();
+
+    // 두 점 사이 거리 계산 (핀치 줌)
+    function getDistance(touches) {
+        return Math.hypot(touches[0].clientX - touches[1].clientX, touches[0].clientY - touches[1].clientY);
+    }
+
+    // 터치 이벤트 (모바일 드래그 및 핀치 줌)
+    mapViewport.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 2) {
+            isDragging = false;
+            initialDistance = getDistance(e.touches);
+            initialScale = currentScale;
+        } else if (e.touches.length === 1) {
+            isDragging = true;
+            startX = e.touches[0].clientX - currentX;
+            startY = e.touches[0].clientY - currentY;
+        }
+    }, {passive: false});
+
+    window.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 2) {
+            e.preventDefault();
+            const currentDistance = getDistance(e.touches);
+            const scaleChange = currentDistance / initialDistance;
+            currentScale = Math.min(Math.max(0.5, initialScale * scaleChange), 2.5); // 0.5배 ~ 2.5배
+            updateMapTransform();
+        } else if (isDragging && e.touches.length === 1) {
+            e.preventDefault();
+            currentX = e.touches[0].clientX - startX;
+            currentY = e.touches[0].clientY - startY;
+            updateMapTransform();
+        }
+    }, {passive: false});
+
+    window.addEventListener('touchend', () => {
+        isDragging = false;
+        initialDistance = null;
+    });
+
+    // 마우스 이벤트 (PC 드래그)
+    mapViewport.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        startX = e.clientX - currentX;
+        startY = e.clientY - currentY;
+    });
+    window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        currentX = e.clientX - startX;
+        currentY = e.clientY - startY;
+        updateMapTransform();
+    });
+    window.addEventListener('mouseup', () => { isDragging = false; });
+
+    // 마우스 휠 이벤트 (PC 줌인/아웃)
+    mapViewport.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const zoomSensitivity = 0.0015;
+        currentScale -= e.deltaY * zoomSensitivity;
+        currentScale = Math.min(Math.max(0.5, currentScale), 2.5);
+        updateMapTransform();
+    }, {passive: false});
+
+
+    /* ==========================================
+       주차 입차 및 혜택 연동 로직
+       ========================================== */
+    function triggerParking(lotName) {
+        document.getElementById('loading-modal').style.display = 'flex';
         
         setTimeout(() => {
-            document.getElementById('loading-modal').classList.add('hidden');
-            document.getElementById('loading-modal').classList.remove('flex');
-            document.getElementById('lbl-parking-name').innerText = lotName;
-            document.getElementById('purpose-modal').classList.remove('hidden');
-            document.getElementById('purpose-modal').classList.add('flex');
-        }, 1200);
+            document.getElementById('loading-modal').style.display = 'none';
+            document.getElementById('purpose-modal').style.display = 'flex';
+        }, 1000);
     }
 
     function confirmPurpose(visiting) {
         isVisiting = visiting;
-        document.getElementById('purpose-modal').classList.add('hidden');
-        document.getElementById('purpose-modal').classList.remove('flex');
-        startParking();
-    }
-
-    function startParking() {
+        document.getElementById('purpose-modal').style.display = 'none';
+        
         parkingState = 'parking';
         visitedStores = [];
         usedSeconds = 0;
         supportMinutes = 0;
         
+        // 입차 시간 기록
+        const now = new Date();
+        entryTimeStr = now.getHours().toString().padStart(2, '0') + ':' + 
+                       now.getMinutes().toString().padStart(2, '0') + ':' + 
+                       now.getSeconds().toString().padStart(2, '0');
+        
         document.getElementById('view-home-ready').classList.add('hidden');
         document.getElementById('view-home-parking').classList.remove('hidden');
         document.getElementById('top-dashboard').classList.remove('hidden');
+        document.getElementById('main-scroll-area').scrollTop = 0;
         
         updateDashboard();
-        
         if(timerInterval) clearInterval(timerInterval);
-        timerInterval = setInterval(() => {
-            usedSeconds += 1; 
-            updateDashboard();
-        }, 1000);
+        timerInterval = setInterval(() => { usedSeconds += 1; updateDashboard(); }, 1000);
 
-        let msg = isVisiting ? "상점가 이용 모드로 설정되었습니다." : "일반 주차 모드로 설정되었습니다.";
-        showToast("관제 데이터 동기화 완료: " + msg);
+        let msg = isVisiting ? "상점가 이용 모드로 입차 감지됨" : "일반 주차 모드로 입차 감지됨";
+        showToast("관제 시스템 연동: " + msg);
     }
 
-    // 결제 연동 (하이브리드 위치 인증 시연 포함)
     function payMySelf(mins, storeName) {
-        if(parkingState !== 'parking') { alert("입차 후 이용 가능합니다."); return; }
+        document.getElementById('auth-modal').style.display = 'flex';
         
-        // 1. 하이브리드 검증 모달 띄우기
-        document.getElementById('auth-modal').classList.remove('hidden');
-        document.getElementById('auth-modal').classList.add('flex');
-        
-        // 2. 검증 완료 후 처리
         setTimeout(() => {
-            document.getElementById('auth-modal').classList.add('hidden');
-            document.getElementById('auth-modal').classList.remove('flex');
+            document.getElementById('auth-modal').style.display = 'none';
             
             supportMinutes += mins;
             if (!visitedStores.includes(storeName)) visitedStores.push(storeName);
             updateDashboard();
-            showToast(`[위치 인증 완료] ${storeName}<br>결제 연동 성공! (+${mins}분)`);
-        }, 1500); // 1.5초간 검증 연출
+            showToast(`${storeName} 결제 연동 성공! (+${mins}분)`);
+        }, 1500);
     }
 
-    // QR 스캔 (일행)
     function simulateScanFriend(mins, storeName) {
-        if(parkingState !== 'parking') {
-            alert("입차 후 이용 가능합니다.");
-            switchTab('home', document.getElementById('nav-home'));
-            return;
-        }
+        if(parkingState !== 'parking') { alert("먼저 홈에서 입차를 진행해주세요."); return; }
         supportMinutes += mins;
         if (!visitedStores.includes(storeName)) visitedStores.push(storeName);
         updateDashboard();
-        showToast(`일행 주차 혜택 연동 완료!<br>(+${mins}분 합산됨)`);
-        setTimeout(() => switchTab('home', document.getElementById('nav-home')), 1500);
+        showToast(`일행의 혜택 스캔 완료! (+${mins}분)`);
+        setTimeout(() => switchTab('home', document.getElementById('nav-home')), 1000);
     }
 
-    // 특허 핵심: 대표자 결제 취소 시 권한 일괄 무효화
     function cancelPayment() {
-        if(supportMinutes === 0) {
-            showToast("취소할 혜택 내역이 없습니다.", true);
-            return;
-        }
-        
-        // 혜택 몰수 (마이너스로 복귀)
+        if(supportMinutes === 0) { showToast("취소할 내역이 없습니다.", true); return; }
         supportMinutes = 0; 
         visitedStores = [];
         updateDashboard();
-        
-        showToast("대표 결제 취소 감지!<br>연동된 주차 권한이 일괄 폐기되었습니다.", true);
+        showToast("대표 결제 취소 감지!<br>주차 권한이 실시간 일괄 폐기되었습니다.", true);
         setTimeout(() => switchTab('home', document.getElementById('nav-home')), 2000);
     }
 
-    // 대시보드 UI 업데이트
     function updateDashboard() {
         let totalSupportSec = supportMinutes * 60;
         let balanceSec = totalSupportSec - usedSeconds; 
@@ -596,41 +706,41 @@
         let s = absSec % 60;
         
         if (balanceSec < 0) {
-            // 마이너스
             dashRemain.innerText = "-" + m + '분 ' + s + '초';
             dashRemain.className = "text-4xl font-black text-red-500 tracking-tighter";
             dashStatus.innerHTML = `<span class="material-symbols-outlined text-[14px] mr-1">info</span>상권 미이용 (요금 부과 대상)`;
-            dashStatus.className = "text-xs text-red-500 font-bold mb-1 flex items-center";
+            dashStatus.className = "text-[11px] text-red-500 font-bold mb-1 flex items-center";
             dashProgress.style.width = "100%";
-            dashProgress.style.backgroundColor = "#f87171";
+            dashProgress.style.backgroundColor = "#ef4444";
         } else {
-            // 플러스
             dashRemain.innerText = "+" + m + '분 ' + s + '초';
-            dashRemain.className = "text-4xl font-black text-blue-600 tracking-tighter shadow-blue-500";
+            dashRemain.className = "text-4xl font-black text-blue-600 tracking-tighter";
             dashStatus.innerHTML = `<span class="material-symbols-outlined text-[14px] mr-1">check_circle</span>상권 혜택 적용 중 (잔여 시간)`;
-            dashStatus.className = "text-xs text-blue-500 font-bold mb-1 flex items-center";
-            
-            let progressPercent = totalSupportSec === 0 ? 0 : Math.min(100, (usedSeconds / totalSupportSec) * 100);
-            dashProgress.style.width = progressPercent + "%";
+            dashStatus.className = "text-[11px] text-blue-500 font-bold mb-1 flex items-center";
+            let p = totalSupportSec === 0 ? 0 : Math.min(100, (usedSeconds / totalSupportSec) * 100);
+            dashProgress.style.width = p + "%";
             dashProgress.style.backgroundColor = "#3b82f6";
         }
-        
         document.getElementById('dash-support').innerText = supportMinutes + "분";
         document.getElementById('dash-used').innerText = Math.floor(usedSeconds/60) + "분";
     }
 
-    // 출차 모달
+    /* ==========================================
+       출차 및 정산 로직
+       ========================================== */
     function openCheckoutModal() {
-        document.getElementById('checkout-modal').classList.remove('hidden');
-        document.getElementById('checkout-modal').classList.add('flex');
+        document.getElementById('checkout-modal').style.display = 'flex';
     }
 
     function confirmCheckout() {
-        document.getElementById('checkout-modal').classList.add('hidden');
-        document.getElementById('checkout-modal').classList.remove('flex');
-        
+        document.getElementById('checkout-modal').style.display = 'none';
         clearInterval(timerInterval);
         parkingState = 'receipt';
+        
+        const now = new Date();
+        const exitTimeStr = now.getHours().toString().padStart(2, '0') + ':' + 
+                            now.getMinutes().toString().padStart(2, '0') + ':' + 
+                            now.getSeconds().toString().padStart(2, '0');
         
         document.getElementById('top-dashboard').classList.add('hidden');
         document.getElementById('view-home-parking').classList.add('hidden');
@@ -639,7 +749,7 @@
         
         let usedMinsVal = Math.floor(usedSeconds / 60);
         let remainingMins = supportMinutes - usedMinsVal;
-        let storesText = visitedStores.length > 0 ? visitedStores.join(', ') : '상점 이용 없음';
+        let storesText = visitedStores.length > 0 ? visitedStores.join(', ') : '결제 내역 없음';
 
         document.getElementById('rcpt-stores').innerText = storesText;
         document.getElementById('rcpt-support').innerText = supportMinutes + "분";
@@ -652,74 +762,77 @@
         const resultTxt = document.getElementById('rcpt-refund-txt');
 
         if(remainingMins >= 0) {
-            resultBox.className = "flex justify-between items-center p-5 bg-blue-50 rounded-xl shadow-inner border border-blue-100";
+            resultBox.className = "flex justify-between items-center p-6 rounded-2xl shadow-inner bg-blue-50 border border-blue-100";
             resultTitle.innerText = "서구청 예산 자동 환원";
-            resultTitle.className = "block font-black text-sm text-blue-800";
+            resultTitle.className = "block font-black text-base text-blue-900";
             resultDesc.innerText = "미사용 시간 반납";
-            resultDesc.className = "block text-[10px] mt-1 font-bold text-blue-600";
+            resultDesc.className = "block text-xs mt-1 font-bold text-blue-600";
             resultVal.innerText = remainingMins + "분";
-            resultVal.className = "text-3xl font-black tracking-tighter text-blue-600";
-            resultTxt.innerHTML = `김이강 님, 오늘 상권 방문에 감사드립니다!<br>사용하지 않으신 <span class="text-blue-600 font-black">${remainingMins}분</span> 혜택은<br>서구청 예산으로 자동 환원되었습니다.`;
+            resultVal.className = "text-4xl font-black tracking-tighter text-blue-600";
+            resultTxt.innerHTML = `김이강 님, 오늘 상권 방문에 감사드립니다!<br>미사용 혜택 <span class="text-blue-600 font-black">${remainingMins}분</span>은 서구청 예산으로 자동 환원되었습니다.`;
         } else {
             let fee = Math.abs(remainingMins) * 50; 
-            resultBox.className = "flex justify-between items-center p-5 bg-red-50 rounded-xl shadow-inner border border-red-100";
+            resultBox.className = "flex justify-between items-center p-6 rounded-2xl shadow-inner bg-red-50 border border-red-100";
             resultTitle.innerText = "추가 요금 자동 결제";
-            resultTitle.className = "block font-black text-sm text-red-800";
-            resultDesc.innerText = "초과 이용 정산";
-            resultDesc.className = "block text-[10px] mt-1 font-bold text-red-600";
+            resultTitle.className = "block font-black text-base text-red-900";
+            resultDesc.innerText = "혜택 초과 이용 정산";
+            resultDesc.className = "block text-xs mt-1 font-bold text-red-600";
             resultVal.innerText = fee.toLocaleString() + "원";
             resultVal.className = "text-3xl font-black tracking-tighter text-red-600";
-            resultTxt.innerHTML = `확보된 지원 시간보다 <span class="text-red-500 font-black">${Math.abs(remainingMins)}분</span> 초과되었습니다.<br>등록된 결제 수단으로 ${fee.toLocaleString()}원이 청구됩니다.`;
+            resultTxt.innerHTML = `확보 혜택보다 <span class="text-red-500 font-black">${Math.abs(remainingMins)}분</span> 초과되었습니다.<br>등록된 카드로 ${fee.toLocaleString()}원이 자동 결제됩니다.`;
         }
 
-        appendToHistory(supportMinutes, usedMinsVal, remainingMins, storesText);
+        appendToHistory(entryTimeStr, exitTimeStr, supportMinutes, usedMinsVal, remainingMins, storesText);
     }
 
-    function appendToHistory(support, used, remaining, storesStr) {
+    function appendToHistory(entryTime, exitTime, support, used, remaining, storesStr) {
         const historyList = document.getElementById('history-list');
         const newItem = document.createElement('div');
-        let parkingName = document.getElementById('lbl-parking-name').innerText;
+        const today = new Date();
+        const dateStr = `${today.getFullYear()}.${(today.getMonth()+1).toString().padStart(2,'0')}.${today.getDate().toString().padStart(2,'0')}`;
 
         if (remaining >= 0) {
-            newItem.className = "bg-white p-5 rounded-2xl shadow-sm border border-gray-200 relative overflow-hidden fade-in";
+            newItem.className = "bg-white p-6 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden fade-in";
             newItem.innerHTML = `
-                <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
-                <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
-                    <span class="text-xs font-bold text-gray-500 flex items-center"><span class="material-symbols-outlined text-[16px] mr-1">event_available</span> 방금 전</span>
-                    <span class="text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded-md">정산 완료</span>
+                <div class="absolute top-0 left-0 w-1.5 h-full bg-blue-500"></div>
+                <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-50">
+                    <span class="text-xs font-black text-gray-400">정산 완료 | ${dateStr}</span>
                 </div>
-                <h3 class="font-bold text-gray-800 mb-1 text-sm">${parkingName}</h3>
-                <p class="text-[10px] text-blue-500 font-bold mb-4">방문 상점: ${storesStr}</p>
-                <div class="flex justify-between text-xs mb-2"><span class="text-gray-500 font-bold">확보 시간</span><span class="font-black text-gray-800">${support}분</span></div>
-                <div class="flex justify-between text-xs mb-4"><span class="text-gray-500 font-bold">실제 체류 시간</span><span class="font-black text-gray-800">${used}분</span></div>
-                <div class="bg-blue-50 p-3 rounded-xl flex justify-between items-center border border-blue-100">
-                    <span class="text-[10px] font-bold text-blue-800">서구청 예산 자동 환원</span><span class="font-black text-blue-600 text-sm">${remaining}분</span>
+                <h4 class="font-black text-gray-800 mb-2 text-base">통합 주차 허브</h4>
+                <div class="space-y-1.5 text-[11px] font-bold text-gray-500 mb-5">
+                    <p>입차: ${entryTime} / 출차: ${exitTime}</p>
+                    <p>방문 상점: ${storesStr}</p>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-xl flex justify-between items-center">
+                    <div><p class="text-[11px] text-blue-800 font-black">서구청 예산 자동 환원</p><p class="text-[10px] text-blue-600 mt-0.5 font-bold">미사용 혜택 회수</p></div>
+                    <span class="text-xl font-black text-blue-600">${remaining}분</span>
                 </div>
             `;
         } else {
             let fee = Math.abs(remaining) * 50;
-            newItem.className = "bg-white p-5 rounded-2xl shadow-sm border border-gray-200 relative overflow-hidden fade-in";
+            newItem.className = "bg-white p-6 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden fade-in";
             newItem.innerHTML = `
-                <div class="absolute top-0 left-0 w-1 h-full bg-red-500"></div>
-                <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-3">
-                    <span class="text-xs font-bold text-gray-500 flex items-center"><span class="material-symbols-outlined text-[16px] mr-1">event_available</span> 방금 전</span>
-                    <span class="text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded-md">정산 완료</span>
+                <div class="absolute top-0 left-0 w-1.5 h-full bg-red-500"></div>
+                <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-50">
+                    <span class="text-xs font-black text-gray-400">자동 결제 | ${dateStr}</span>
                 </div>
-                <h3 class="font-bold text-gray-800 mb-1 text-sm">${parkingName}</h3>
-                <p class="text-[10px] text-blue-500 font-bold mb-4">방문 상점: ${storesStr}</p>
-                <div class="flex justify-between text-xs mb-2"><span class="text-gray-500 font-bold">확보 시간</span><span class="font-black text-gray-800">${support}분</span></div>
-                <div class="flex justify-between text-xs mb-4"><span class="text-gray-500 font-bold">실제 체류 시간</span><span class="font-black text-red-500">${used}분</span></div>
-                <div class="bg-red-50 p-3 rounded-xl flex justify-between items-center border border-red-100">
-                    <span class="text-[10px] font-bold text-red-800">추가 요금 결제</span><span class="font-black text-red-600 text-sm">${fee.toLocaleString()}원</span>
+                <h4 class="font-black text-gray-800 mb-2 text-base">통합 주차 허브</h4>
+                <div class="space-y-1.5 text-[11px] font-bold text-gray-500 mb-5">
+                    <p>입차: ${entryTime} / 출차: ${exitTime}</p>
+                    <p>방문 상점: ${storesStr}</p>
+                </div>
+                <div class="bg-red-50 p-4 rounded-xl flex justify-between items-center">
+                    <div><p class="text-[11px] text-red-800 font-black">추가 요금 결제</p><p class="text-[10px] text-red-600 mt-0.5 font-bold">${Math.abs(remaining)}분 초과</p></div>
+                    <span class="text-xl font-black text-red-600">${fee.toLocaleString()}원</span>
                 </div>
             `;
         }
         historyList.insertBefore(newItem, historyList.firstChild);
     }
 
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
     function resetApp() {
         parkingState = 'ready';
-        document.getElementById('search-input').value = "";
         document.getElementById('view-home-receipt').classList.remove('flex');
         document.getElementById('view-home-receipt').classList.add('hidden');
         switchTab('home', document.getElementById('nav-home'));
