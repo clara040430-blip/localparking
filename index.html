@@ -60,10 +60,10 @@
         .marker-public { position: absolute; width: 32px; height: 32px; border-radius: 50%; background: white; border: 3px solid #2563eb; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #2563eb; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .marker-private { position: absolute; width: 32px; height: 32px; border-radius: 8px; background: white; border: 3px solid #f59e0b; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #f59e0b; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         
-        /* 내 위치 핑 (크기 및 원색 효과 대폭 강화) */
+        /* 내 위치 핑 (크기 및 진한 크림슨 레드(#CC0000) 효과 강화) */
         .my-location { position: absolute; z-index: 50; display: flex; flex-direction: column; align-items: center; transform: translate(-50%, -50%); }
-        .my-location-dot { width: 20px; height: 20px; background: #FF0000; border: 4px solid white; border-radius: 50%; box-shadow: 0 0 10px rgba(255,0,0,0.8); position: relative; z-index: 2; }
-        .my-location-ping { position: absolute; width: 50px; height: 50px; background: rgba(255, 0, 0, 0.8); border-radius: 50%; animation: ping-slow 2s infinite cubic-bezier(0, 0, 0.2, 1); z-index: 1; top: -15px; left: -15px; }
+        .my-location-dot { width: 20px; height: 20px; background: #CC0000; border: 4px solid white; border-radius: 50%; box-shadow: 0 0 10px rgba(204,0,0,0.8); position: relative; z-index: 2; }
+        .my-location-ping { position: absolute; width: 50px; height: 50px; background: rgba(204, 0, 0, 0.8); border-radius: 50%; animation: ping-slow 2s infinite cubic-bezier(0, 0, 0.2, 1); z-index: 1; top: -15px; left: -15px; }
 
         /* ---------------- 인트로 화면 ---------------- */
         #intro-splash { position: absolute; inset: 0; z-index: 1000; background-color: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
@@ -376,7 +376,7 @@
                         </div>
 
                         <div class="my-location top-[780px] left-[650px]">
-                            <div class="bg-[#FF0000] text-white text-[10px] px-2 py-0.5 rounded font-black mb-1 shadow-md">현재 위치</div>
+                            <div class="bg-[#CC0000] text-white text-[10px] px-2 py-0.5 rounded font-black mb-1 shadow-md">현재 위치</div>
                             <div class="my-location-dot"></div>
                             <div class="my-location-ping"></div>
                         </div>
@@ -580,8 +580,8 @@
     
     let isDragging = false;
     let currentX = -500; 
-    let currentY = -250; 
-    let currentScale = 1;
+    let currentY = -365; 
+    let currentScale = 0.5;
     let startX, startY;
     let initialDistance = null;
     let initialScale = 1;
@@ -593,7 +593,7 @@
 
     // 초기화
     function resetMapPosition() {
-        currentX = -500; currentY = -250; currentScale = 1;
+        currentX = -500; currentY = -365; currentScale = 0.5;
         mapCanvas.style.transition = "transform 0.3s ease-out";
         updateMapTransform();
         setTimeout(() => { mapCanvas.style.transition = "none"; }, 300);
