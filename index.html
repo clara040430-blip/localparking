@@ -52,18 +52,18 @@
         .bldg-public { background: #f8fafc; }
         .bldg-commercial { background: #fffbeb; border-color: #fcd34d; border-bottom-color: #fbbf24; }
         
-        /* 주차 지원 구역 (점선/해칭) - 건물 위로 올라오도록 z-index 20 부여 및 진한 색상 변경 */
-        .zone-public { position: absolute; border: 3px dashed #1d4ed8; background: rgba(29, 78, 216, 0.15); border-radius: 16px; pointer-events: none; z-index: 20; }
-        .zone-private { position: absolute; border: 3px dashed #b45309; background: rgba(180, 83, 9, 0.15); border-radius: 16px; pointer-events: none; z-index: 20; }
+        /* 주차 지원 구역 (점선/해칭) - 건물 위로 올라오도록 z-index 20 부여 및 쨍한 원색 변경 */
+        .zone-public { position: absolute; border: 3px dashed #0000FF; background: rgba(0, 0, 255, 0.15); border-radius: 16px; pointer-events: none; z-index: 20; }
+        .zone-private { position: absolute; border: 3px dashed #FF6600; background: rgba(255, 102, 0, 0.15); border-radius: 16px; pointer-events: none; z-index: 20; }
         
         /* 마커 */
         .marker-public { position: absolute; width: 32px; height: 32px; border-radius: 50%; background: white; border: 3px solid #2563eb; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #2563eb; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .marker-private { position: absolute; width: 32px; height: 32px; border-radius: 8px; background: white; border: 3px solid #f59e0b; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #f59e0b; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         
-        /* 내 위치 핑 - 진한 빨간색으로 변경 */
+        /* 내 위치 핑 - 쨍한 원색 빨강 변경 */
         .my-location { position: absolute; z-index: 50; display: flex; flex-direction: column; align-items: center; transform: translate(-50%, -50%); }
-        .my-location-dot { width: 16px; height: 16px; background: #b91c1c; border: 3px solid white; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.4); position: relative; z-index: 2; }
-        .my-location-ping { position: absolute; width: 40px; height: 40px; background: rgba(185, 28, 28, 0.6); border-radius: 50%; animation: ping-slow 2s infinite cubic-bezier(0, 0, 0.2, 1); z-index: 1; top: -12px; left: -12px; }
+        .my-location-dot { width: 16px; height: 16px; background: #FF0000; border: 3px solid white; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.4); position: relative; z-index: 2; }
+        .my-location-ping { position: absolute; width: 40px; height: 40px; background: rgba(255, 0, 0, 0.6); border-radius: 50%; animation: ping-slow 2s infinite cubic-bezier(0, 0, 0.2, 1); z-index: 1; top: -12px; left: -12px; }
 
         /* ---------------- 인트로 화면 ---------------- */
         #intro-splash { position: absolute; inset: 0; z-index: 1000; background-color: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
@@ -331,11 +331,11 @@
                         </div>
                         
                         <div class="zone-public w-[450px] h-[500px] top-[200px] left-[650px] transform rotate-[10deg]">
-                            <span class="absolute -top-6 left-10 bg-blue-700 text-white text-[11px] px-3 py-1 rounded-full font-bold shadow-md">서구청 제1 / 보건소 주차장 연합 구역</span>
+                            <span class="absolute -top-6 left-10 bg-[#0000FF] text-white text-[11px] px-3 py-1 rounded-full font-bold shadow-md">서구청 제1 / 보건소 주차장 연합 구역</span>
                         </div>
                         
                         <div class="zone-private w-[450px] h-[300px] top-[850px] left-[300px] transform rotate-[-10deg]">
-                            <span class="absolute -top-6 left-10 bg-amber-700 text-white text-[11px] px-3 py-1 rounded-full font-bold shadow-md">KJB 상생 금융 주차장 구역</span>
+                            <span class="absolute -top-6 left-10 bg-[#FF6600] text-white text-[11px] px-3 py-1 rounded-full font-bold shadow-md">KJB 상생 금융 주차장 구역</span>
                         </div>
 
                         <div class="bldg bldg-public w-[200px] h-[150px] top-[300px] left-[850px]" style="z-index: 10;">
@@ -376,7 +376,7 @@
                         </div>
 
                         <div class="my-location top-[780px] left-[650px]">
-                            <div class="bg-red-700 text-white text-[10px] px-2 py-0.5 rounded font-black mb-1 shadow-md">현재 위치</div>
+                            <div class="bg-[#FF0000] text-white text-[10px] px-2 py-0.5 rounded font-black mb-1 shadow-md">현재 위치</div>
                             <div class="my-location-dot"></div>
                             <div class="my-location-ping"></div>
                         </div>
