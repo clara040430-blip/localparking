@@ -579,8 +579,8 @@
     const mapViewport = document.getElementById('map-viewport');
     
     let isDragging = false;
-    let currentX = -500; 
-    let currentY = -365; 
+    let currentX = 0; 
+    let currentY = 0; 
     let currentScale = 0.5;
     let startX, startY;
     let initialDistance = null;
@@ -591,14 +591,31 @@
         mapCanvas.style.transform = `translate(${currentX}px, ${currentY}px) scale(${currentScale})`;
     }
 
-    // 초기화
+    // 초기화 (기기 화면 크기를 계산하여 완벽한 정중앙으로 자동 정렬)
     function resetMapPosition() {
-        currentX = -500; currentY = -365; currentScale = 0.5;
+        const viewport = document.getElementById('map-viewport');
+        const vw = viewport.clientWidth || 360; 
+        const vh = viewport.clientHeight || 600;
+        
+        // 지도상 '현재 위치'의 고정 좌표
+        const targetX = 650;
+        const targetY = 780;
+        currentScale = 0.5;
+        
+        // transform-origin: center center (750px 750px) 기준 스케일 적용 시 화면 좌표 변환
+        const scaledX = 750 + (targetX - 750) * currentScale;
+        const scaledY = 750 + (targetY - 750) * currentScale;
+        
+        // 뷰포트의 정중앙에 오도록 계산
+        currentX = (vw / 2) - scaledX;
+        currentY = (vh / 2) - scaledY;
+
         mapCanvas.style.transition = "transform 0.3s ease-out";
         updateMapTransform();
         setTimeout(() => { mapCanvas.style.transition = "none"; }, 300);
     }
     
+    // 초기 로드 시점에는 위치를 한 번 잡아줌 (실제 정밀 정렬은 탭 오픈 시 계산됨)
     resetMapPosition();
 
     // 두 점 사이 거리 계산 (핀치 줌)
