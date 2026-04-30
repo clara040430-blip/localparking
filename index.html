@@ -606,9 +606,10 @@
         const scaledX = 750 + (targetX - 750) * currentScale;
         const scaledY = 750 + (targetY - 750) * currentScale;
         
-        // 뷰포트의 정중앙에 오도록 계산
+        // 상단 헤더(제목)와 하단(툴팁 및 네비게이션)이 차지하는 공간을 계산하여 시각적 정중앙으로 끌어올림(오프셋 보정)
+        const visualOffsetY = 60; 
         currentX = (vw / 2) - scaledX;
-        currentY = (vh / 2) - scaledY;
+        currentY = (vh / 2) - scaledY - visualOffsetY;
 
         mapCanvas.style.transition = "transform 0.3s ease-out";
         updateMapTransform();
