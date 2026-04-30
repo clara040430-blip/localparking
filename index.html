@@ -52,18 +52,18 @@
         .bldg-public { background: #f8fafc; }
         .bldg-commercial { background: #fffbeb; border-color: #fcd34d; border-bottom-color: #fbbf24; }
         
-        /* 주차 지원 구역 (점선/해칭) - 건물 위로 올라오도록 z-index 20 부여 및 쨍한 원색 변경 */
-        .zone-public { position: absolute; border: 3px dashed #0000FF; background: rgba(0, 0, 255, 0.15); border-radius: 16px; pointer-events: none; z-index: 20; }
-        .zone-private { position: absolute; border: 3px dashed #FF6600; background: rgba(255, 102, 0, 0.15); border-radius: 16px; pointer-events: none; z-index: 20; }
+        /* 주차 지원 구역 (테두리 두께 증가, 원색 채도 증가) */
+        .zone-public { position: absolute; border: 4px dashed #0000FF; background: rgba(0, 0, 255, 0.2); border-radius: 16px; pointer-events: none; z-index: 20; }
+        .zone-private { position: absolute; border: 4px dashed #FF3300; background: rgba(255, 51, 0, 0.2); border-radius: 16px; pointer-events: none; z-index: 20; }
         
         /* 마커 */
         .marker-public { position: absolute; width: 32px; height: 32px; border-radius: 50%; background: white; border: 3px solid #2563eb; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #2563eb; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .marker-private { position: absolute; width: 32px; height: 32px; border-radius: 8px; background: white; border: 3px solid #f59e0b; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #f59e0b; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         
-        /* 내 위치 핑 - 쨍한 원색 빨강 변경 */
+        /* 내 위치 핑 (크기 및 원색 효과 대폭 강화) */
         .my-location { position: absolute; z-index: 50; display: flex; flex-direction: column; align-items: center; transform: translate(-50%, -50%); }
-        .my-location-dot { width: 16px; height: 16px; background: #FF0000; border: 3px solid white; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.4); position: relative; z-index: 2; }
-        .my-location-ping { position: absolute; width: 40px; height: 40px; background: rgba(255, 0, 0, 0.6); border-radius: 50%; animation: ping-slow 2s infinite cubic-bezier(0, 0, 0.2, 1); z-index: 1; top: -12px; left: -12px; }
+        .my-location-dot { width: 20px; height: 20px; background: #FF0000; border: 4px solid white; border-radius: 50%; box-shadow: 0 0 10px rgba(255,0,0,0.8); position: relative; z-index: 2; }
+        .my-location-ping { position: absolute; width: 50px; height: 50px; background: rgba(255, 0, 0, 0.8); border-radius: 50%; animation: ping-slow 2s infinite cubic-bezier(0, 0, 0.2, 1); z-index: 1; top: -15px; left: -15px; }
 
         /* ---------------- 인트로 화면 ---------------- */
         #intro-splash { position: absolute; inset: 0; z-index: 1000; background-color: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
@@ -78,7 +78,7 @@
 <div class="app-container">
 
     <div id="intro-splash">
-        <img src="intro.png" alt="인트로 화면">
+        <img src="intro.png" alt="">
     </div>
 
     <div id="main-app-content" class="fade-in">
@@ -207,10 +207,10 @@
                                 </div>
                                 <span class="bg-gray-900 text-white text-xs font-black px-4 py-2.5 rounded-xl">입차</span>
                             </div>
-                            <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm flex justify-between items-center group cursor-pointer active:scale-95 transition" onclick="triggerParking('KJB 상생 금융 주차장')">
+                            <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm flex justify-between items-center group cursor-pointer active:scale-95 transition" onclick="triggerParking('골목 상생 주차장')">
                                 <div class="flex items-center gap-4">
-                                    <div class="w-12 h-12 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-600 border border-indigo-100"><span class="material-symbols-outlined">account_balance</span></div>
-                                    <div><p class="font-black text-[15px] text-gray-800 mb-1">KJB 상생 금융 주차장</p><p class="text-[11px] text-gray-400 font-bold tracking-tight">총 30면 | 주차 10대 | <span class="text-indigo-500">가능 20대</span></p></div>
+                                    <div class="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center text-orange-600 border border-orange-100"><span class="material-symbols-outlined">local_parking</span></div>
+                                    <div><p class="font-black text-[15px] text-gray-800 mb-1">골목 상생 주차장</p><p class="text-[11px] text-gray-400 font-bold tracking-tight">총 30면 | 주차 10대 | <span class="text-orange-500">가능 20대</span></p></div>
                                 </div>
                                 <span class="bg-gray-900 text-white text-xs font-black px-4 py-2.5 rounded-xl">입차</span>
                             </div>
@@ -245,10 +245,10 @@
                                 </div>
                                 <div class="bg-gray-50 border border-gray-200 text-gray-700 font-black text-xs px-4 py-2 rounded-xl">결제</div>
                             </button>
-                            <button onclick="payMySelf(120, '슈퍼마켓 비타민')" class="w-full flex items-center justify-between p-5 bg-white border border-gray-200 rounded-3xl active:scale-95 transition shadow-sm">
+                            <button onclick="payMySelf(120, '골목 마트')" class="w-full flex items-center justify-between p-5 bg-white border border-gray-200 rounded-3xl active:scale-95 transition shadow-sm">
                                 <div class="flex items-center">
                                     <div class="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center text-green-600 mr-4"><span class="material-symbols-outlined" style="font-size: 28px;">shopping_basket</span></div>
-                                    <div class="text-left"><p class="font-black text-gray-800 text-base mb-1">슈퍼마켓 비타민</p><p class="text-[11px] text-gray-500 font-bold">결제 시연 (2시간 지원)</p></div>
+                                    <div class="text-left"><p class="font-black text-gray-800 text-base mb-1">골목 마트</p><p class="text-[11px] text-gray-500 font-bold">결제 시연 (2시간 지원)</p></div>
                                 </div>
                                 <div class="bg-gray-50 border border-gray-200 text-gray-700 font-black text-xs px-4 py-2 rounded-xl">결제</div>
                             </button>
@@ -335,7 +335,7 @@
                         </div>
                         
                         <div class="zone-private w-[450px] h-[300px] top-[850px] left-[300px] transform rotate-[-10deg]">
-                            <span class="absolute -top-6 left-10 bg-[#FF6600] text-white text-[11px] px-3 py-1 rounded-full font-bold shadow-md">KJB 상생 금융 주차장 구역</span>
+                            <span class="absolute -top-6 left-10 bg-[#FF3300] text-white text-[11px] px-3 py-1 rounded-full font-bold shadow-md">골목 상생 주차장 구역</span>
                         </div>
 
                         <div class="bldg bldg-public w-[200px] h-[150px] top-[300px] left-[850px]" style="z-index: 10;">
@@ -348,7 +348,7 @@
                             <span class="text-[12px]">서구보건소</span>
                         </div>
                         <div class="bldg bldg-public w-[180px] h-[100px] top-[880px] left-[550px]" style="z-index: 10;">
-                            <span class="text-[12px]">KJB 광주은행<br>& 슈퍼마켓 비타민</span>
+                            <span class="text-[12px]">서구 상생지원센터<br>& 골목 마트</span>
                         </div>
 
                         <div class="bldg bldg-commercial w-[90px] h-[70px] top-[260px] left-[780px]" style="z-index: 5;">행복 식당</div>
@@ -372,7 +372,7 @@
                         </div>
                         <div class="marker-private top-[900px] left-[700px]" style="z-index: 20;">
                             P
-                            <span class="absolute top-10 w-[120px] text-center text-[11px] text-amber-700 font-black bg-white/90 px-1 py-0.5 rounded shadow-sm">KJB 상생 금융 주차장</span>
+                            <span class="absolute top-10 w-[120px] text-center text-[11px] text-orange-600 font-black bg-white/90 px-1 py-0.5 rounded shadow-sm">골목 상생 주차장</span>
                         </div>
 
                         <div class="my-location top-[780px] left-[650px]">
