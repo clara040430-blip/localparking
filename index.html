@@ -29,7 +29,6 @@
             overflow: hidden; 
             background-color: #f1f5f9; 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            touch-action: none; 
         }
         
         .app-container { height: 100vh; height: 100dvh; height: -webkit-fill-available; display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; background: #ffffff; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.1); overflow: hidden; }
@@ -50,7 +49,7 @@
         .modal-overlay { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); display: none; position: absolute; inset: 0; z-index: 200; align-items: center; justify-content: center; padding: 20px; }
         
         /* ---------------- 지도 커스텀 디자인 ---------------- */
-        .map-viewport { width: 100%; height: 100%; overflow: hidden; position: relative; background: #eef2f6; cursor: grab; }
+        .map-viewport { width: 100%; height: 100%; overflow: hidden; position: relative; background: #eef2f6; cursor: grab; touch-action: none; }
         .map-viewport:active { cursor: grabbing; }
         .map-canvas { width: 1500px; height: 1500px; position: absolute; transform-origin: center center; will-change: transform; transition: transform 0.05s linear; }
         
@@ -326,7 +325,6 @@
                 </div>
             </div>
 
-            <!-- 지도 탭: h-[80vh] 및 relative 추가 -->
             <div id="tab-map" class="tab-content hidden h-[80vh] relative flex flex-col fade-in">
                 <div class="absolute top-0 left-0 w-full p-4 pt-6 z-30 flex justify-between items-center pointer-events-none bg-gradient-to-b from-white/90 to-transparent">
                     <h2 class="font-black text-xl text-gray-800 px-2 drop-shadow-md">서구청 중심 상권 지도</h2>
@@ -421,7 +419,6 @@
                 </div>
             </div>
 
-            <!-- QR 탭: 스크롤 공간 확보 위해 min-h-[80vh] 설정 -->
             <div id="tab-qr" class="tab-content hidden min-h-[80vh] flex flex-col fade-in overflow-y-auto pb-20">
                 <div class="p-6 pt-8 bg-white border-b border-gray-100 mb-4">
                     <h2 class="font-black text-2xl text-gray-800 flex items-center mb-2"><span class="material-symbols-outlined text-orange-500 mr-2" style="font-size:32px;">qr_code_scanner</span>동행인 QR 공유</h2>
@@ -470,7 +467,7 @@
                     <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-full flex items-center justify-center text-white font-black text-3xl shadow-sm border-2 border-blue-100">홍</div>
                     <div>
                         <h3 class="font-black text-xl text-gray-800 mb-1">홍석기 <span class="text-sm font-bold text-gray-500">님</span></h3>
-                        <p class="text-[11px] text-blue-600 font-black bg-blue-50 px-2.5 py-1 rounded-md inline-block">풍암동 상권 연합 조합원</p>
+                        <p class="text-[11px] text-blue-600 font-black bg-blue-50 px-2.5 py-1 rounded-md inline-block">농성동 상권 연합 조합원</p>
                     </div>
                 </div>
 
@@ -816,9 +813,9 @@
         parkingState = 'receipt';
         
         const now = new Date();
-        const exitTimeStr = now.getHours().toString().padStart(2, '0') + ':' + 
-                            now.getMinutes().toString().padStart(2, '0') + ':' + 
-                            now.getSeconds().toString().padStart(2, '0');
+        const exitTimeStr = now.getHours().toString().padStart(2, '0') + 
+                            ':' + now.getMinutes().toString().padStart(2, '0') + 
+                            ':' + now.getSeconds().toString().padStart(2, '0');
         
         document.getElementById('top-dashboard').classList.add('hidden');
         document.getElementById('view-home-parking').classList.add('hidden');
