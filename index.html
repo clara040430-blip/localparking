@@ -31,11 +31,11 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
         }
         
-        .app-container { height: 100%; height: -webkit-fill-available; display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; background: #ffffff; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.1); overflow: hidden; }
+        .app-container { height: 100vh; height: 100dvh; height: -webkit-fill-available; display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; background: #ffffff; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.1); overflow: hidden; }
         
-        /* 스크롤 먹통 완벽 해결: min-height: 0 강제 적용 */
+        /* 스크롤 먹통 & 지도 증발 완벽 해결: min-height: 0 와 height: 100% 동시 적용 */
         #main-app-content { display: none; height: 100%; flex-direction: column; min-height: 0; }
-        .tabs-wrapper { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px)); background: #f8fafc; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+        .tabs-wrapper { flex: 1; min-height: 0; height: 100%; overflow-y: auto; overflow-x: hidden; padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px)); background: #f8fafc; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
         ::-webkit-scrollbar { width: 0px; background: transparent; }
         
         /* 네비게이션 바 */
@@ -325,7 +325,7 @@
                 </div>
             </div>
 
-            <div id="tab-map" class="tab-content hidden w-full relative flex flex-col fade-in" style="height: calc(100vh - 100px); height: calc(100dvh - 100px);">
+            <div id="tab-map" class="tab-content hidden h-full flex flex-col fade-in overflow-hidden">
                 <div class="absolute top-0 left-0 w-full p-4 pt-6 z-30 flex justify-between items-center pointer-events-none bg-gradient-to-b from-white/90 to-transparent">
                     <h2 class="font-black text-xl text-gray-800 px-2 drop-shadow-md">서구청 중심 상권 지도</h2>
                     <button class="bg-white p-3 rounded-full pointer-events-auto shadow-lg border border-gray-100 text-blue-600" onclick="resetMapPosition()"><span class="material-symbols-outlined" style="font-size:24px;">my_location</span></button>
@@ -628,7 +628,7 @@
             mapCanvas.style.transition = "transform 0.3s ease-out";
             updateMapTransform();
             setTimeout(() => { mapCanvas.style.transition = "none"; }, 300);
-        }, 10);
+        }, 50);
     }
     
     // 초기 로드 시점에는 위치를 한 번 잡아줌 (실제 정밀 정렬은 탭 오픈 시 계산됨)
