@@ -32,7 +32,9 @@
         }
         
         .app-container { height: 100vh; height: 100dvh; height: -webkit-fill-available; display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; background: #ffffff; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.1); overflow: hidden; }
-        .tabs-wrapper { flex: 1; overflow-y: auto; overflow-x: hidden; padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px)); background: #f8fafc; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+        
+        /* 스크롤 먹통 완벽 해결: min-height: 0 추가 */
+        .tabs-wrapper { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px)); background: #f8fafc; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
         ::-webkit-scrollbar { width: 0px; background: transparent; }
         
         /* 네비게이션 바 */
@@ -80,8 +82,8 @@
         #intro-splash { position: absolute; inset: 0; z-index: 1000; background-color: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         #intro-splash img { width: auto; height: 100%; object-fit: cover; }
         
-        /* 메인 앱 컨텐츠 초기 숨김 */
-        #main-app-content { display: none; height: 100%; flex-direction: column; }
+        /* 메인 앱 컨텐츠 초기 숨김 (min-height: 0 추가) */
+        #main-app-content { display: none; flex: 1; flex-direction: column; min-height: 0; width: 100%; }
     </style>
 </head>
 <body>
@@ -325,6 +327,7 @@
                 </div>
             </div>
 
+            <!-- 지도 탭: h-[80vh] 및 relative 유지 -->
             <div id="tab-map" class="tab-content hidden h-[80vh] relative flex flex-col fade-in">
                 <div class="absolute top-0 left-0 w-full p-4 pt-6 z-30 flex justify-between items-center pointer-events-none bg-gradient-to-b from-white/90 to-transparent">
                     <h2 class="font-black text-xl text-gray-800 px-2 drop-shadow-md">서구청 중심 상권 지도</h2>
@@ -419,6 +422,7 @@
                 </div>
             </div>
 
+            <!-- QR 탭: min-h-[80vh] 유지 -->
             <div id="tab-qr" class="tab-content hidden min-h-[80vh] flex flex-col fade-in overflow-y-auto pb-20">
                 <div class="p-6 pt-8 bg-white border-b border-gray-100 mb-4">
                     <h2 class="font-black text-2xl text-gray-800 flex items-center mb-2"><span class="material-symbols-outlined text-orange-500 mr-2" style="font-size:32px;">qr_code_scanner</span>동행인 QR 공유</h2>
@@ -639,7 +643,7 @@
         return Math.hypot(touches[0].clientX - touches[1].clientX, touches[0].clientY - touches[1].clientY);
     }
 
-    // 터치 이벤트 (모바일 드래그 및 핀치 줌)
+    // 터치 이벤트 (window에서 mapViewport로 이동시켜 스크롤 방해 완벽 차단)
     mapViewport.addEventListener('touchstart', (e) => {
         if (e.touches.length === 2) {
             isDragging = false;
@@ -652,7 +656,7 @@
         }
     }, {passive: false});
 
-    window.addEventListener('touchmove', (e) => {
+    mapViewport.addEventListener('touchmove', (e) => {
         if (e.touches.length === 2) {
             e.preventDefault();
             const currentDistance = getDistance(e.touches);
@@ -667,7 +671,7 @@
         }
     }, {passive: false});
 
-    window.addEventListener('touchend', () => {
+    mapViewport.addEventListener('touchend', () => {
         isDragging = false;
         initialDistance = null;
     });
@@ -678,14 +682,15 @@
         startX = e.clientX - currentX;
         startY = e.clientY - currentY;
     });
-    window.addEventListener('mousemove', (e) => {
+    mapViewport.addEventListener('mousemove', (e) => {
         if (!isDragging) return;
         e.preventDefault();
         currentX = e.clientX - startX;
         currentY = e.clientY - startY;
         updateMapTransform();
     });
-    window.addEventListener('mouseup', () => { isDragging = false; });
+    mapViewport.addEventListener('mouseup', () => { isDragging = false; });
+    mapViewport.addEventListener('mouseleave', () => { isDragging = false; });
 
     // 마우스 휠 이벤트 (PC 줌인/아웃)
     mapViewport.addEventListener('wheel', (e) => {
