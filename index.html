@@ -31,10 +31,11 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
         }
         
-        .app-container { height: 100%; height: -webkit-fill-available; display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; background: #ffffff; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.1); overflow: hidden; }
+        .app-container { height: 100vh; height: 100dvh; height: -webkit-fill-available; display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; background: #ffffff; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.1); overflow: hidden; }
         
-        #main-app-content { display: none; height: 100%; flex-direction: column; min-height: 0; }
-        .tabs-wrapper { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px)); background: #f8fafc; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+        /* 스크롤 먹통 & 하단 잘림 완벽 해결: flex: 1 적용 및 넉넉한 하단 패딩(120px) 추가 */
+        #main-app-content { display: none; flex: 1; flex-direction: column; min-height: 0; }
+        .tabs-wrapper { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)); background: #f8fafc; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
         ::-webkit-scrollbar { width: 0px; background: transparent; }
         
         /* 네비게이션 바 */
@@ -177,7 +178,7 @@
 
         <div class="tabs-wrapper" id="main-scroll-area">
             
-            <div id="tab-home" class="tab-content fade-in min-h-full">
+            <div id="tab-home" class="tab-content fade-in">
                 
                 <div id="view-home-ready" class="p-5 pt-6 space-y-6">
                     <div class="flex items-center gap-4 mb-2 pl-2">
@@ -293,7 +294,7 @@
                     </button>
                 </div>
 
-                <div id="view-home-receipt" class="p-6 hidden fade-in flex-col pt-10 min-h-full">
+                <div id="view-home-receipt" class="p-6 hidden fade-in flex-col pt-10">
                     <div class="flex flex-col items-center">
                         <div class="w-24 h-24 bg-blue-50 border-4 border-white rounded-full flex items-center justify-center text-blue-600 mb-6 shadow-lg">
                             <span class="material-symbols-outlined" style="font-size: 50px;">task_alt</span>
@@ -335,6 +336,7 @@
                 </div>
             </div>
 
+            <!-- 지도 탭 유지 -->
             <div id="tab-map" class="tab-content hidden fade-in">
                 <div class="absolute top-0 left-0 w-full p-4 pt-6 z-30 flex justify-between items-center pointer-events-none bg-gradient-to-b from-white/90 to-transparent">
                     <h2 class="font-black text-xl text-gray-800 px-2 drop-shadow-md">서구청 중심 상권 지도</h2>
@@ -409,7 +411,7 @@
                 </div>
             </div>
 
-            <div id="tab-history" class="tab-content hidden p-5 pt-8 fade-in min-h-full">
+            <div id="tab-history" class="tab-content hidden p-5 pt-8 fade-in">
                 <h2 class="font-black text-2xl text-gray-800 mb-6 flex items-center"><span class="material-symbols-outlined text-teal-500 mr-2" style="font-size:30px;">receipt_long</span>상세 이용 내역</h2>
                 <div id="history-list" class="space-y-4 pb-10">
                     <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm opacity-70">
@@ -429,7 +431,8 @@
                 </div>
             </div>
 
-            <div id="tab-qr" class="tab-content hidden min-h-full flex flex-col fade-in pb-20">
+            <!-- QR 공유 탭 스크롤 관련 불필요한 클래스들 모두 제거 -->
+            <div id="tab-qr" class="tab-content hidden flex flex-col fade-in">
                 <div class="p-6 pt-8 bg-white border-b border-gray-100 mb-4">
                     <h2 class="font-black text-2xl text-gray-800 flex items-center mb-2"><span class="material-symbols-outlined text-orange-500 mr-2" style="font-size:32px;">qr_code_scanner</span>동행인 QR 공유</h2>
                     <p class="text-xs text-gray-500 font-bold leading-relaxed">내가 결제한 혜택을 나누거나,<br>일행이 결제한 혜택을 내 차로 가져옵니다.</p>
@@ -470,7 +473,7 @@
                 </div>
             </div>
 
-            <div id="tab-my" class="tab-content hidden p-5 pt-8 fade-in min-h-full">
+            <div id="tab-my" class="tab-content hidden p-5 pt-8 fade-in">
                 <h2 class="font-black text-2xl text-gray-800 mb-6 flex items-center"><span class="material-symbols-outlined text-purple-500 mr-2" style="font-size:30px;">campaign</span>상권 소식 & 마이</h2>
                 
                 <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 mb-5 flex items-center gap-5">
